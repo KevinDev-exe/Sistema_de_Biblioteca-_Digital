@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body p-4">
+
+        <h1>
+            Usuarios
+        </h1>
+
+        <p class="text-muted">
+            Control de roles, estado y sanciones.
+        </p>
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Usuario</th>
+
+                    <th>Email</th>
+
+                    <th>Rol</th>
+
+                    <th>Sancionado</th>
+
+                    <th>Activo</th>
+
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for usuario in usuarios %}
+
+                    <tr>
+
+                        <td>
+
+                            <strong>
+                                {{ usuario.username }}
+                            </strong>
+
+                            <br>
+
+                            {{ usuario.perfil.primer_nombre }}
+                            {{ usuario.perfil.primer_apellido }}
+
+                        </td>
+
+                        <td>
+                            {{ usuario.email }}
+                        </td>
+
+                        <td>
+                            {{ usuario.perfil.get_rol_display }}
+                        </td>
+
+                        <td>
+
+                            {% if usuario.perfil.sancionado %}
+
+                                Sí
+
+                            {% else %}
+
+                                No
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if usuario.perfil.activo %}
+
+                                Sí
+
+                            {% else %}
+
+                                No
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'editar_usuario' usuario.id %}"
+                                class="btn btn-sm btn-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
