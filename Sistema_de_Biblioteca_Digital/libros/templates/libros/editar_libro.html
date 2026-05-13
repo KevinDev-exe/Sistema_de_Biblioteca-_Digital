@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card card-dashboard">
+
+    <div class="card-body">
+
+        <h2 class="mb-4">
+            Editar libro
+        </h2>
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            {% if libro.imagen %}
+
+                <img
+                    src="{{ libro.imagen.url }}"
+                    width="120"
+                    class="rounded mb-3"
+                >
+
+            {% endif %}
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar cambios
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

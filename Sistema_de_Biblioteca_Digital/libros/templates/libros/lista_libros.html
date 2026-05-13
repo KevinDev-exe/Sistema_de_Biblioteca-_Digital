@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2>
+            Libros
+        </h2>
+
+        <p class="text-muted">
+            Administración de libros.
+        </p>
+
+    </div>
+
+    <a
+        href="{% url 'crear_libro' %}"
+        class="btn btn-primary"
+    >
+        Nuevo libro
+    </a>
+
+</div>
+
+<div class="card card-dashboard">
+
+    <div class="card-body">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Imagen
+                    </th>
+
+                    <th>
+                        Título
+                    </th>
+
+                    <th>
+                        Autor
+                    </th>
+
+                    <th>
+                        Categoría
+                    </th>
+
+                    <th>
+                        Disponibles
+                    </th>
+
+                    <th>
+                        Estado
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for libro in libros %}
+
+                    <tr>
+
+                        <td>
+
+                            {% if libro.imagen %}
+
+                                <img
+                                    src="{{ libro.imagen.url }}"
+                                    width="70"
+                                    class="rounded"
+                                >
+
+                            {% else %}
+
+                                Sin imagen
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ libro.titulo }}
+                        </td>
+
+                        <td>
+                            {{ libro.autor }}
+                        </td>
+
+                        <td>
+                            {{ libro.categoria }}
+                        </td>
+
+                        <td>
+                            {{ libro.disponibles }}
+                        </td>
+
+                        <td>
+                            {{ libro.estado }}
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'editar_libro' libro.id %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Editar
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            No hay libros registrados.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
