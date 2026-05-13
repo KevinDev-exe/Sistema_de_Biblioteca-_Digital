@@ -1,0 +1,43 @@
+body{
+    background-color: #f4f6f9;
+}
+
+.sidebar{
+    width: 260px;
+    min-height: 100vh;
+    background-color: #0f172a;
+}
+
+.sidebar .nav-link{
+    color: #cbd5e1;
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.sidebar .nav-link:hover{
+    background-color: #1e293b;
+    color: white;
+}
+
+.sidebar .nav-link.active{
+    background-color: #2563eb;
+    color: white;
+}
+
+.main-content{
+    flex: 1;
+    padding: 30px;
+}
+
+.topbar{
+    background-color: white;
+    border-bottom: 1px solid #dee2e6;
+    padding: 15px 25px;
+}
+
+.card-dashboard{
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 0 15px rgba(0,0,0,.05);
+}
