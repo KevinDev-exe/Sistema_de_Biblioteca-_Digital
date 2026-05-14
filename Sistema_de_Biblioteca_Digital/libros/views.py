@@ -1,14 +1,54 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
 from .forms import LibroForm, AutorForm, CategoriaForm
 from .models import Libro, Autor, Categoria
+from prestamos.models import Prestamo
 
 
 def es_admin(usuario):
 
     return usuario.perfil.rol == 'ADMIN'
 
+@login_required
+def lista_libros(request):
+
+    libros = Libro.objects.all()
+
+    buscar = request.GET.get('buscar')
+
+    if buscar:
+
+        libros = libros.filter(
+            titulo__icontains=buscar
+        )
+
+    prestamos_usuario = Prestamo.objects.filter(
+        usuario=request.user,
+        estado__in=[
+            'PENDIENTE',
+            'ACTIVO',
+            'RETRASADO'
+        ]
+    )
+
+    libros_solicitados = []
+
+    for prestamo in prestamos_usuario:
+
+        libros_solicitados.append(
+            prestamo.libro.id
+        )
+
+    return render(
+        request,
+        'libros/lista_libros.html',
+        {
+            'libros': libros,
+            'libros_solicitados': libros_solicitados
+        }
+    )
 
 @login_required
 def crear_libro(request):
@@ -45,30 +85,7 @@ def crear_libro(request):
             'form': form
         }
     )
-
-
-@login_required
-def lista_libros(request):
-
-    buscar = request.GET.get('buscar')
-
-    libros = Libro.objects.all()
-
-    if buscar:
-
-        libros = libros.filter(
-            titulo__icontains=buscar
-        )
-
-    return render(
-        request,
-        'libros/lista_libros.html',
-        {
-            'libros': libros
-        }
-    )
-
-
+    
 @login_required
 def editar_libro(request, libro_id):
 

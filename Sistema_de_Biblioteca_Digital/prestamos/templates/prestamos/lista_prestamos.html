@@ -1,48 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 
-<td>
-
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="bi bi-arrow-left-right"></i>
+        Gestión de Préstamos
+    </h2>
     {% if request.user.perfil.rol == 'ADMIN' %}
-
-    {% if prestamo.estado == 'PENDIENTE' %}
-
-    <a href="{% url 'aprobar_prestamo' prestamo.id %}" class="btn btn-success btn-sm">
-
-        Aprobar
-
+    <a href="{% url 'crear_prestamo' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i>
+        Nuevo préstamo
     </a>
-
     {% endif %}
+</div>
 
-
-    {% if prestamo.estado == 'ACTIVO' or prestamo.estado == 'RETRASADO' %}
-
-    <a href="{% url 'devolver_prestamo' prestamo.id %}" class="btn btn-warning btn-sm">
-
-        Registrar devolución
-
-    </a>
-
-    {% endif %}
-
-    {% endif %}
-
-
-    {% if request.user.perfil.rol == 'LECTOR' and prestamo.estado == 'PENDIENTE' %}
-
-    <a href="{% url 'cancelar_prestamo' prestamo.id %}" class="btn btn-danger btn-sm">
-
-        Cancelar solicitud
-
-    </a>
-
-    {% endif %}
-
-</td>
-
-<div class="table-responsive">
-    <table class="table table-hover">
+<div class="table-responsive shadow bg-white rounded p-3">
+    <table class="table table-hover align-middle">
         <thead class="table-dark">
             <tr>
                 <th>Libro</th>
@@ -72,19 +45,65 @@
                 </td>
                 <td>{% if p.multa > 0 %}${{ p.multa|floatformat:0 }}{% else %}—{% endif %}</td>
                 <td>
-                    <a href="{% url 'detalle_prestamo' p.id %}" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    {% if user.perfil.rol == 'ADMIN' and p.estado == 'ACTIVO' or p.estado == 'RETRASADO' %}
-                    <a href="{% url 'devolver_prestamo' p.id %}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-arrow-return-left"></i> Devolver
-                    </a>
-                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'detalle_prestamo' p.id %}" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        
+                        {% if request.user.perfil.rol == 'ADMIN' %}
+                            {% if p.estado == 'PENDIENTE' %}
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalAprobar{{ p.id }}" title="Aprobar préstamo">
+                                    <i class="bi bi-check-lg"></i> Aprobar
+                                </button>
+                                <a href="{% url 'cancelar_prestamo' p.id %}" class="btn btn-sm btn-danger" title="Cancelar solicitud">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            {% endif %}
+                            
+                            {% if p.estado == 'ACTIVO' or p.estado == 'RETRASADO' %}
+                                <a href="{% url 'devolver_prestamo' p.id %}" class="btn btn-sm btn-warning" title="Registrar devolución">
+                                    <i class="bi bi-arrow-return-left"></i> Devolver
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            {% if p.estado == 'PENDIENTE' %}
+                                <a href="{% url 'cancelar_prestamo' p.id %}" class="btn btn-sm btn-danger" title="Cancelar solicitud">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
+
+            <!-- Modal para Aprobar Préstamo -->
+            <div class="modal fade" id="modalAprobar{{ p.id }}" tabindex="-1" aria-labelledby="modalAprobarLabel{{ p.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="{% url 'aprobar_prestamo' p.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalAprobarLabel{{ p.id }}">Aprobar Préstamo: {{ p.libro.titulo }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Por favor, indica hasta cuándo estará prestado este libro al lector <strong>{{ p.usuario.username }}</strong>. Puedes colocar una fecha pasada para probar las multas.</p>
+                                <div class="mb-3">
+                                    <label for="fecha_devolucion{{ p.id }}" class="form-label">Fecha de devolución:</label>
+                                    <input type="date" name="fecha_devolucion" id="fecha_devolucion{{ p.id }}" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Confirmar Aprobación</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center text-muted">No hay préstamos registrados.</td>
+                <td colspan="7" class="text-center text-muted py-4">No hay préstamos registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

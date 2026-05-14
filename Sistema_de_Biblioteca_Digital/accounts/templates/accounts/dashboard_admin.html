@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    📚 Panel Bibliotecario
+</h2>
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Total libros</h6>
+            <h1>{{total_libros}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Solicitudes</h6>
+            <h1>{{solicitudes_pendientes}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Préstamos activos</h6>
+            <h1>{{prestamos_activos}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Retrasados</h6>
+            <h1>{{retrasados}}</h1>
+        </div>
+    </div>
+
+</div>
+
+<br>
+
+<a href="{% url 'lista_prestamos' %}" class="btn btn-primary">
+
+    Ver solicitudes y préstamos
+
+</a>
+
+<br>
+<br>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h5>📊 Libros más solicitados</h5>
+                <canvas id="chartLibros"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h5>✍️ Autores más leídos</h5>
+                <canvas id="chartAutores"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-12">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h5>📅 Préstamos por mes</h5>
+                <canvas id="chartMeses" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        // 1. Gráfico de Libros
+        const ctxLibros = document.getElementById("chartLibros");
+        new Chart(ctxLibros, {
+            type: "bar",
+            data: {
+                labels: JSON.parse('{{ libros_labels|escapejs }}'),
+                datasets: [{
+                    label: "Reservas",
+                    data: JSON.parse('{{ libros_data|escapejs }}'),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // 2. Gráfico de Autores
+        const ctxAutores = document.getElementById("chartAutores");
+        new Chart(ctxAutores, {
+            type: "bar",
+            data: {
+                labels: JSON.parse('{{ autores_labels|escapejs }}'),
+                datasets: [{
+                    label: "Lecturas",
+                    data: JSON.parse('{{ autores_data|escapejs }}'),
+                    backgroundColor: 'rgba(255, 159, 64, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // 3. Gráfico de Préstamos por Mes
+        const ctxMeses = document.getElementById("chartMeses");
+        new Chart(ctxMeses, {
+            type: "line",
+            data: {
+                labels: JSON.parse('{{ meses_labels|escapejs }}'),
+                datasets: [{
+                    label: "Préstamos",
+                    data: JSON.parse('{{ meses_data|escapejs }}'),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    });
+</script>
+
+{% endblock %}

@@ -6,13 +6,68 @@ from django.contrib import messages
 from .forms import (RegistroForm,PerfilForm,UsuarioUpdateForm,)
 from django.contrib.auth.forms import PasswordResetForm
 from prestamos.models import Prestamo
-from libros.models import Libro
 from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from libros.models import Libro, Autor
 import json
 
 @login_required
 def dashboard(request):
 
+    # DASHBOARD BIBLIOTECARIO
+    if request.user.perfil.rol == 'ADMIN':
+
+        total_libros = Libro.objects.count()
+
+        solicitudes_pendientes = Prestamo.objects.filter(
+            estado='PENDIENTE'
+        ).count()
+
+        prestamos_activos = Prestamo.objects.filter(
+            estado='ACTIVO'
+        ).count()
+
+        retrasados = Prestamo.objects.filter(
+            estado='RETRASADO'
+        ).count()
+
+        top_libros = Libro.objects.annotate(
+            total=Count('prestamos')
+        ).order_by('-total')[:5]
+        libros_labels = [x.titulo for x in top_libros]
+        libros_data = [x.total for x in top_libros]
+
+        top_autores = Autor.objects.annotate(
+            total=Count('libro__prestamos')
+        ).order_by('-total')[:5]
+        autores_labels = [x.nombre for x in top_autores]
+        autores_data = [x.total for x in top_autores]
+
+        prestamos_mes = Prestamo.objects.annotate(
+            mes=TruncMonth('fecha_prestamo')
+        ).values('mes').annotate(total=Count('id')).order_by('mes')
+        meses_labels = [p['mes'].strftime('%m/%Y') for p in prestamos_mes if p['mes']]
+        meses_data = [p['total'] for p in prestamos_mes if p['mes']]
+
+        return render(
+            request,
+            'accounts/dashboard_admin.html',
+            {
+                'total_libros': total_libros,
+                'solicitudes_pendientes': solicitudes_pendientes,
+                'prestamos_activos': prestamos_activos,
+                'retrasados': retrasados,
+                'libros_labels': json.dumps(libros_labels),
+                'libros_data': json.dumps(libros_data),
+                'autores_labels': json.dumps(autores_labels),
+                'autores_data': json.dumps(autores_data),
+                'meses_labels': json.dumps(meses_labels),
+                'meses_data': json.dumps(meses_data),
+            }
+        )
+
+
+    # DASHBOARD LECTOR
     prestamos_usuario = Prestamo.objects.filter(
         usuario=request.user
     )
@@ -31,14 +86,6 @@ def dashboard(request):
 
     total_libros = Libro.objects.count()
 
-    top_libros = Libro.objects.annotate(
-        total=Count('prestamos')
-    ).order_by('-total')[:5]
-
-    labels = [x.titulo for x in top_libros]
-
-    data = [x.total for x in top_libros]
-
     return render(
         request,
         'accounts/dashboard.html',
@@ -46,9 +93,7 @@ def dashboard(request):
             'activos': activos,
             'retrasados': retrasados,
             'devueltos': devueltos,
-            'total_libros': total_libros,
-            'labels': json.dumps(labels),
-            'data': json.dumps(data),
+            'total_libros': total_libros
         }
     )
 
