@@ -130,12 +130,22 @@
                     Mi perfil
                 </a>
 
-                <a
-                    href="{% url 'logout' %}"
-                    class="btn btn-danger btn-sm"
+                <form
+                    method="POST"
+                    action="{% url 'logout' %}"
+                    class="d-inline"
                 >
-                    Cerrar sesión
-                </a>
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger btn-sm"
+                    >
+                        Cerrar sesión
+                    </button>
+
+                </form>
 
             </div>
 
