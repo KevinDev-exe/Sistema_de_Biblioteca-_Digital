@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'Sistema_de_Biblioteca_Digital.urls'
@@ -138,7 +139,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'kevinyamid2005@gmail.com'
-EMAIL_HOST_PASSWORD = 'TU_PASSWORD_DE_APLICACION'
+EMAIL_HOST_PASSWORD = 'gjth ndpk jelm qbxp'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

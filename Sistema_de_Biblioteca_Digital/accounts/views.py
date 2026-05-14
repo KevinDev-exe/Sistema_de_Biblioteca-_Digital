@@ -1,17 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth.models import User
-
 from django.contrib import messages
-
-from .forms import (
-    RegistroForm,
-    PerfilForm,
-    UsuarioUpdateForm,
-)
+from .forms import (RegistroForm,PerfilForm,UsuarioUpdateForm,)
+from django.contrib.auth.forms import PasswordResetForm
 
 def login_view(request):
 
@@ -52,6 +45,47 @@ def login_view(request):
     return render(
         request,
         'accounts/login.html'
+    )
+
+def password_reset_view(request):
+
+    if request.method == 'POST':
+
+        form = PasswordResetForm(request.POST)
+
+        if form.is_valid():
+
+            email = form.cleaned_data['email']
+
+            if not User.objects.filter(email=email).exists():
+
+                messages.error(
+                    request,
+                    'No existe una cuenta registrada con ese correo.'
+                )
+
+            else:
+
+                form.save(
+                    request=request,
+                    use_https=False,
+                    email_template_name='accounts/password_reset_email.html'
+                )
+
+                request.session['reset_email'] = email
+
+                return redirect('password_reset_done')
+
+    else:
+
+        form = PasswordResetForm()
+
+    return render(
+        request,
+        'accounts/password_reset.html',
+        {
+            'form': form
+        }
     )
 
 def registro(request):
