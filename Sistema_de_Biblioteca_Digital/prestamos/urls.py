@@ -33,4 +33,16 @@ urlpatterns = [
         name='reservar_libro'
     ),
 
+    path(
+        '<int:prestamo_id>/aprobar/',
+        views.aprobar_prestamo,
+        name='aprobar_prestamo'
+    ),
+
+    path(
+        '<int:prestamo_id>/cancelar/',
+        views.cancelar_prestamo,
+        name='cancelar_prestamo'
+    ),
+
 ]

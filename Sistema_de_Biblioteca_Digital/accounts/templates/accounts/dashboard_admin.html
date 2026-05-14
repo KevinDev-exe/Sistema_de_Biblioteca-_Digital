@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    📚 Panel Bibliotecario
+</h2>
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Total libros</h6>
+            <h1>{{total_libros}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Solicitudes</h6>
+            <h1>{{solicitudes_pendientes}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Préstamos activos</h6>
+            <h1>{{prestamos_activos}}</h1>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-4 text-center">
+            <h6>Retrasados</h6>
+            <h1>{{retrasados}}</h1>
+        </div>
+    </div>
+
+</div>
+
+<br>
+
+<a href="{% url 'lista_prestamos' %}" class="btn btn-primary">
+
+    Ver solicitudes y préstamos
+
+</a>
+
+{% endblock %}

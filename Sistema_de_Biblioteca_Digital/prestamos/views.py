@@ -56,6 +56,24 @@ def reservar_libro(request, libro_id):
             'lista_libros'
         )
 
+    # Verificar si ya existe una solicitud
+    solicitud_existente = Prestamo.objects.filter(
+        usuario=request.user,
+        libro=libro,
+        estado__in=['PENDIENTE','ACTIVO','RETRASADO']
+    ).exists()
+
+    if solicitud_existente:
+
+        messages.warning(
+            request,
+            'Ya tienes una solicitud o préstamo activo para este libro.'
+        )
+
+        return redirect(
+            'lista_libros'
+        )
+
     if libro.disponibles <= 0:
 
         messages.error(
@@ -73,7 +91,7 @@ def reservar_libro(request, libro_id):
 
         libro=libro,
 
-        fecha_devolucion=timezone.localdate() + timedelta(days=7),
+        fecha_devolucion=timezone.localdate()+timedelta(days=7),
 
         estado='PENDIENTE'
     )
@@ -89,54 +107,58 @@ def reservar_libro(request, libro_id):
 
 
 @login_required
-def aprobar_prestamo(request, prestamo_id):
-
-    if request.user.perfil.rol != 'ADMIN':
-
-        return redirect(
-            'lista_prestamos'
-        )
+def cancelar_prestamo(request, prestamo_id):
 
     prestamo = get_object_or_404(
         Prestamo,
         id=prestamo_id
     )
 
-    prestamo.estado = 'ACTIVO'
+    if request.user.perfil.rol == 'ADMIN' or prestamo.usuario == request.user:
 
-    prestamo.save()
+        if prestamo.estado == 'PENDIENTE':
 
-    messages.success(
-        request,
-        'Préstamo aprobado correctamente.'
-    )
+            prestamo.delete()
 
-    return redirect(
-        'lista_prestamos'
-    )
+            messages.success(
+                request,
+                'Solicitud cancelada.'
+            )
 
-
-@login_required
-def cancelar_prestamo(request, prestamo_id):
-
-    prestamo = get_object_or_404(
-        Prestamo,
-        id=prestamo_id,
-        usuario=request.user
-    )
-
-    if prestamo.estado == 'PENDIENTE':
-
-        prestamo.delete()
-
-        messages.success(
+    else:
+        
+        messages.error(
             request,
-            'Solicitud cancelada.'
+            'No tienes permiso para cancelar esta solicitud.'
         )
 
     return redirect(
         'lista_prestamos'
     )
+
+@login_required
+def aprobar_prestamo(request, prestamo_id):
+
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if request.method == 'POST':
+        fecha_devolucion = request.POST.get('fecha_devolucion')
+        if not fecha_devolucion:
+            messages.error(request, 'Debe indicar una fecha de devolución.')
+            return redirect('lista_prestamos')
+
+        if prestamo.estado == 'PENDIENTE':
+            prestamo.fecha_devolucion = fecha_devolucion
+            prestamo.estado = 'ACTIVO'
+            prestamo.save()
+            messages.success(request, 'Solicitud aprobada y fecha asignada correctamente.')
+        else:
+            messages.error(request, 'Solo se pueden aprobar préstamos pendientes.')
+    
+    return redirect('lista_prestamos')
 
 
 @login_required

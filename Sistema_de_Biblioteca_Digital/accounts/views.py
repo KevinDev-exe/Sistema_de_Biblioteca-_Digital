@@ -13,6 +13,45 @@ import json
 @login_required
 def dashboard(request):
 
+    # DASHBOARD BIBLIOTECARIO
+    if request.user.perfil.rol == 'ADMIN':
+
+        total_libros = Libro.objects.count()
+
+        solicitudes_pendientes = Prestamo.objects.filter(
+            estado='PENDIENTE'
+        ).count()
+
+        prestamos_activos = Prestamo.objects.filter(
+            estado='ACTIVO'
+        ).count()
+
+        retrasados = Prestamo.objects.filter(
+            estado='RETRASADO'
+        ).count()
+
+        top_libros = Libro.objects.annotate(
+            total=Count('prestamos')
+        ).order_by('-total')[:5]
+
+        labels = [x.titulo for x in top_libros]
+        data = [x.total for x in top_libros]
+
+        return render(
+            request,
+            'accounts/dashboard_admin.html',
+            {
+                'total_libros': total_libros,
+                'solicitudes_pendientes': solicitudes_pendientes,
+                'prestamos_activos': prestamos_activos,
+                'retrasados': retrasados,
+                'labels': json.dumps(labels),
+                'data': json.dumps(data),
+            }
+        )
+
+
+    # DASHBOARD LECTOR
     prestamos_usuario = Prestamo.objects.filter(
         usuario=request.user
     )
@@ -31,14 +70,6 @@ def dashboard(request):
 
     total_libros = Libro.objects.count()
 
-    top_libros = Libro.objects.annotate(
-        total=Count('prestamos')
-    ).order_by('-total')[:5]
-
-    labels = [x.titulo for x in top_libros]
-
-    data = [x.total for x in top_libros]
-
     return render(
         request,
         'accounts/dashboard.html',
@@ -46,9 +77,7 @@ def dashboard(request):
             'activos': activos,
             'retrasados': retrasados,
             'devueltos': devueltos,
-            'total_libros': total_libros,
-            'labels': json.dumps(labels),
-            'data': json.dumps(data),
+            'total_libros': total_libros
         }
     )
 

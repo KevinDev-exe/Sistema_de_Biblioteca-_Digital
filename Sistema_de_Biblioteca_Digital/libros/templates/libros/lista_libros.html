@@ -9,7 +9,7 @@
         <h2>Libros</h2>
 
         <p class="text-muted">
-            Administración de libros
+            Biblioteca digital
         </p>
 
     </div>
@@ -27,12 +27,12 @@
 </div>
 
 
-<form method="GET" class="mb-3">
+<form method="GET" class="mb-4">
 
     <div class="input-group">
 
         <input type="text" name="buscar" class="form-control" placeholder="Buscar libro..."
-            value="{{ request.GET.buscar }}">
+            value="{{request.GET.buscar}}">
 
         <button class="btn btn-primary">
 
@@ -45,11 +45,11 @@
 </form>
 
 
-<div class="card card-dashboard">
+<div class="card shadow">
 
     <div class="card-body">
 
-        <table class="table">
+        <table class="table align-middle">
 
             <thead>
 
@@ -87,21 +87,29 @@
 
                     </td>
 
-                    <td>{{ libro.titulo }}</td>
+                    <td>{{libro.titulo}}</td>
 
-                    <td>{{ libro.autor }}</td>
+                    <td>{{libro.autor}}</td>
 
-                    <td>{{ libro.categoria }}</td>
+                    <td>{{libro.categoria}}</td>
 
-                    <td>{{ libro.disponibles }}/{{ libro.cantidad }}</td>
+                    <td>
 
-                    <td>{{ libro.estado }}</td>
+                        {{libro.disponibles}} / {{libro.cantidad}}
+
+                    </td>
+
+                    <td>
+
+                        {{libro.estado}}
+
+                    </td>
 
                     <td>
 
                         {% if request.user.perfil.rol == 'ADMIN' %}
 
-                        <a href="{% url 'editar_libro' libro.id %}" class="btn btn-primary btn-sm">
+                        <a href="{% url 'editar_libro' libro.id %}" class="btn btn-warning btn-sm">
 
                             Editar
 
@@ -110,13 +118,27 @@
                         {% endif %}
 
 
-                        {% if request.user.perfil.rol == 'LECTOR' and libro.disponibles > 0 %}
+                        {% if request.user.perfil.rol == 'LECTOR' %}
 
-                        <a href="{% url 'reservar_libro' libro.id %}" class="btn btn-success btn-sm">
+                            {% if libro.id in libros_solicitados %}
 
-                            Pedir prestado
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                Solicitud enviada
+                            </button>
 
-                        </a>
+                            {% elif libro.disponibles > 0 %}
+
+                            <a href="{% url 'reservar_libro' libro.id %}" class="btn btn-success btn-sm">
+                                Pedir prestado
+                            </a>
+
+                            {% else %}
+
+                            <button class="btn btn-danger btn-sm" disabled>
+                                Sin disponibilidad
+                            </button>
+
+                            {% endif %}
 
                         {% endif %}
 
@@ -130,7 +152,7 @@
 
                     <td colspan="7">
 
-                        No hay libros registrados.
+                        No hay libros registrados
 
                     </td>
 
