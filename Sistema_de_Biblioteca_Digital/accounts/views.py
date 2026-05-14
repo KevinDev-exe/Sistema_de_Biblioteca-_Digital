@@ -5,12 +5,58 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import (RegistroForm,PerfilForm,UsuarioUpdateForm,)
 from django.contrib.auth.forms import PasswordResetForm
+from prestamos.models import Prestamo
+from libros.models import Libro
+from django.db.models import Count
+import json
+
+@login_required
+def dashboard(request):
+
+    prestamos_usuario = Prestamo.objects.filter(
+        usuario=request.user
+    )
+
+    activos = prestamos_usuario.filter(
+        estado='ACTIVO'
+    ).count()
+
+    retrasados = prestamos_usuario.filter(
+        estado='RETRASADO'
+    ).count()
+
+    devueltos = prestamos_usuario.filter(
+        estado='DEVUELTO'
+    ).count()
+
+    total_libros = Libro.objects.count()
+
+    top_libros = Libro.objects.annotate(
+        total=Count('prestamos')
+    ).order_by('-total')[:5]
+
+    labels = [x.titulo for x in top_libros]
+
+    data = [x.total for x in top_libros]
+
+    return render(
+        request,
+        'accounts/dashboard.html',
+        {
+            'activos': activos,
+            'retrasados': retrasados,
+            'devueltos': devueltos,
+            'total_libros': total_libros,
+            'labels': json.dumps(labels),
+            'data': json.dumps(data),
+        }
+    )
 
 def login_view(request):
 
     if request.user.is_authenticated:
 
-        return redirect('perfil')
+        return redirect('dashboard')
 
     if request.method == 'POST':
 
@@ -33,7 +79,7 @@ def login_view(request):
                 'Bienvenido al sistema.'
             )
 
-            return redirect('perfil')
+            return redirect('dashboard')
 
         else:
 

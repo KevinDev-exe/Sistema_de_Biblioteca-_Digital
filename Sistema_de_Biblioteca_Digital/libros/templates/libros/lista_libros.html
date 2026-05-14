@@ -6,24 +6,44 @@
 
     <div>
 
-        <h2>
-            Libros
-        </h2>
+        <h2>Libros</h2>
 
         <p class="text-muted">
-            Administración de libros.
+            Administración de libros
         </p>
 
     </div>
 
-    <a
-        href="{% url 'crear_libro' %}"
-        class="btn btn-primary"
-    >
+    {% if request.user.perfil.rol == 'ADMIN' %}
+
+    <a href="{% url 'crear_libro' %}" class="btn btn-primary">
+
         Nuevo libro
+
     </a>
 
+    {% endif %}
+
 </div>
+
+
+<form method="GET" class="mb-3">
+
+    <div class="input-group">
+
+        <input type="text" name="buscar" class="form-control" placeholder="Buscar libro..."
+            value="{{ request.GET.buscar }}">
+
+        <button class="btn btn-primary">
+
+            Buscar
+
+        </button>
+
+    </div>
+
+</form>
+
 
 <div class="card card-dashboard">
 
@@ -35,32 +55,13 @@
 
                 <tr>
 
-                    <th>
-                        Imagen
-                    </th>
-
-                    <th>
-                        Título
-                    </th>
-
-                    <th>
-                        Autor
-                    </th>
-
-                    <th>
-                        Categoría
-                    </th>
-
-                    <th>
-                        Disponibles
-                    </th>
-
-                    <th>
-                        Estado
-                    </th>
-                    <th>
-                        Acciones
-                    </th>
+                    <th>Imagen</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoría</th>
+                    <th>Disponibles</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
 
                 </tr>
 
@@ -70,70 +71,70 @@
 
                 {% for libro in libros %}
 
-                    <tr>
+                <tr>
 
-                        <td>
+                    <td>
 
-                            {% if libro.imagen %}
+                        {% if libro.imagen %}
 
-                                <img
-                                    src="{{ libro.imagen.url }}"
-                                    width="70"
-                                    class="rounded"
-                                >
+                        <img src="{{ libro.imagen.url }}" width="70" class="rounded">
 
-                            {% else %}
+                        {% else %}
 
-                                Sin imagen
+                        Sin imagen
 
-                            {% endif %}
+                        {% endif %}
 
-                        </td>
+                    </td>
 
-                        <td>
-                            {{ libro.titulo }}
-                        </td>
+                    <td>{{ libro.titulo }}</td>
 
-                        <td>
-                            {{ libro.autor }}
-                        </td>
+                    <td>{{ libro.autor }}</td>
 
-                        <td>
-                            {{ libro.categoria }}
-                        </td>
+                    <td>{{ libro.categoria }}</td>
 
-                        <td>
-                            {{ libro.disponibles }}/{{ libro.cantidad }}
-                        </td>
+                    <td>{{ libro.disponibles }}/{{ libro.cantidad }}</td>
 
-                        <td>
-                            {{ libro.estado }}
-                        </td>
+                    <td>{{ libro.estado }}</td>
 
-                        <td>
+                    <td>
 
-                            <a
-                                href="{% url 'editar_libro' libro.id %}"
-                                class="btn btn-primary btn-sm"
-                            >
-                                Editar
-                            </a>
+                        {% if request.user.perfil.rol == 'ADMIN' %}
 
-                        </td>
+                        <a href="{% url 'editar_libro' libro.id %}" class="btn btn-primary btn-sm">
 
-                    </tr>
+                            Editar
+
+                        </a>
+
+                        {% endif %}
+
+
+                        {% if request.user.perfil.rol == 'LECTOR' and libro.disponibles > 0 %}
+
+                        <a href="{% url 'reservar_libro' libro.id %}" class="btn btn-success btn-sm">
+
+                            Pedir prestado
+
+                        </a>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
 
                 {% empty %}
 
-                    <tr>
+                <tr>
 
-                        <td colspan="6">
+                    <td colspan="7">
 
-                            No hay libros registrados.
+                        No hay libros registrados.
 
-                        </td>
+                    </td>
 
-                    </tr>
+                </tr>
 
                 {% endfor %}
 

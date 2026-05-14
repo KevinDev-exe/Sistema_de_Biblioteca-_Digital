@@ -72,4 +72,10 @@ urlpatterns = [
         ),
         name='password_reset_complete'
     ),
+
+    path(
+    'dashboard/',
+    views.dashboard,
+    name='dashboard'
+),
 ]

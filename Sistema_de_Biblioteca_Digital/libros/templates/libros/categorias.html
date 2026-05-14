@@ -18,12 +18,13 @@
 
         </div>
 
-        <a
-            href="{% url 'crear_categoria' %}"
-            class="btn btn-primary"
-        >
+        {% if request.user.perfil.rol == 'ADMIN' %}
+
+        <a href="{% url 'crear_categoria' %}" class="btn btn-primary">
             Nueva categoría
         </a>
+
+        {% endif %}
 
     </div>
 
@@ -57,19 +58,23 @@
 
                 <td>
 
-                    <a
-                        href="{% url 'editar_categoria' categoria.id %}"
-                        class="btn btn-warning btn-sm"
-                    >
+                    {% if request.user.perfil.rol == 'ADMIN' %}
+
+                    <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-warning btn-sm">
                         Editar
                     </a>
 
-                    <a
-                        href="{% url 'eliminar_categoria' categoria.id %}"
-                        class="btn btn-danger btn-sm"
-                    >
+                    <a href="{% url 'eliminar_categoria' categoria.id %}" class="btn btn-danger btn-sm">
                         Eliminar
                     </a>
+
+                    {% else %}
+
+                    <span class="text-muted">
+                        Solo lectura
+                    </span>
+
+                    {% endif %}
 
                 </td>
 
