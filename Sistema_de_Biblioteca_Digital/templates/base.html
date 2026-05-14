@@ -92,6 +92,15 @@
 
             </li>
 
+            </li>
+
+            <li class="nav-item">
+                <a href="{% url 'lista_prestamos' %}" class="nav-link">
+                    <i class="bi bi-arrow-left-right"></i>
+                    Préstamos
+                </a>
+            </li>
+
             {% if user.perfil.rol == 'ADMIN' %}
 
             <li class="nav-item">

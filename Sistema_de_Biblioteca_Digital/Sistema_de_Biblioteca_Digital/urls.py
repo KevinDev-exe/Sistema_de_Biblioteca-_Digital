@@ -32,7 +32,8 @@ urlpatterns = [
     path('admin/',admin.site.urls),
     path('',include('accounts.urls')),
     path('libros/',include('libros.urls')),
-
+    path('prestamos/', include('prestamos.urls')),
+    
 ]
 
 if settings.DEBUG:

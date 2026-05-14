@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h4 class="mb-0">{{ titulo }}</h4>
+            </div>
+            <div class="card-body">
+                {% if prestamo %}
+                <div class="alert alert-info">
+                    <strong>Libro:</strong> {{ prestamo.libro.titulo }}<br>
+                    <strong>Usuario:</strong> {{ prestamo.usuario.username }}<br>
+                    <strong>Días de retraso:</strong> {{ prestamo.dias_retraso }}<br>
+                    <strong>Multa estimada:</strong> ${{ prestamo.calcular_multa|floatformat:0 }} COP
+                </div>
+                {% endif %}
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a href="{% url 'lista_prestamos' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

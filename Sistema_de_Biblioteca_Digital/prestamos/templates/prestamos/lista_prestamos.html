@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Préstamos</h2>
+    {% if user.perfil.rol == 'ADMIN' %}
+    <a href="{% url 'crear_prestamo' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nuevo préstamo
+    </a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Libro</th>
+                <th>Usuario</th>
+                <th>Fecha préstamo</th>
+                <th>Fecha devolución</th>
+                <th>Estado</th>
+                <th>Multa</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in prestamos %}
+            <tr>
+                <td>{{ p.libro.titulo }}</td>
+                <td>{{ p.usuario.username }}</td>
+                <td>{{ p.fecha_prestamo }}</td>
+                <td>{{ p.fecha_devolucion }}</td>
+                <td>
+                    <span class="badge
+                        {% if p.estado == 'ACTIVO' %}bg-success
+                        {% elif p.estado == 'RETRASADO' %}bg-danger
+                        {% elif p.estado == 'DEVUELTO' %}bg-secondary
+                        {% else %}bg-warning{% endif %}">
+                        {{ p.get_estado_display }}
+                    </span>
+                </td>
+                <td>{% if p.multa > 0 %}${{ p.multa|floatformat:0 }}{% else %}—{% endif %}</td>
+                <td>
+                    <a href="{% url 'detalle_prestamo' p.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    {% if user.perfil.rol == 'ADMIN' and p.estado == 'ACTIVO' or p.estado == 'RETRASADO' %}
+                    <a href="{% url 'devolver_prestamo' p.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-arrow-return-left"></i> Devolver
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">No hay préstamos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
