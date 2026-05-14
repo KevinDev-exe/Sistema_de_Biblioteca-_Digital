@@ -4,13 +4,28 @@
 
 <div class="card p-4 shadow-sm">
 
-    <h1>
-        Categorías
-    </h1>
+    <div class="d-flex justify-content-between mb-3">
 
-    <p class="text-muted">
-        Lista de categorías registradas.
-    </p>
+        <div>
+
+            <h1>
+                Categorías
+            </h1>
+
+            <p class="text-muted">
+                Lista de categorías registradas.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'crear_categoria' %}"
+            class="btn btn-primary"
+        >
+            Nueva categoría
+        </a>
+
+    </div>
 
     <table class="table">
 
@@ -20,6 +35,10 @@
 
                 <th>
                     Nombre
+                </th>
+
+                <th>
+                    Acciones
                 </th>
 
             </tr>
@@ -36,13 +55,31 @@
                     {{ categoria.nombre }}
                 </td>
 
+                <td>
+
+                    <a
+                        href="{% url 'editar_categoria' categoria.id %}"
+                        class="btn btn-warning btn-sm"
+                    >
+                        Editar
+                    </a>
+
+                    <a
+                        href="{% url 'eliminar_categoria' categoria.id %}"
+                        class="btn btn-danger btn-sm"
+                    >
+                        Eliminar
+                    </a>
+
+                </td>
+
             </tr>
 
             {% empty %}
 
             <tr>
 
-                <td>
+                <td colspan="2">
                     No hay categorías registradas.
                 </td>
 

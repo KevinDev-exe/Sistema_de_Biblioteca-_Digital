@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Libro
+from .models import (Libro,Autor, Categoria)
 
 
 class LibroForm(forms.ModelForm):
@@ -20,3 +20,36 @@ class LibroForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'form-control'
             })
+
+class AutorForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Autor
+
+        fields = ['nombre']
+
+        widgets = {
+            'nombre': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            )
+        }
+
+
+class CategoriaForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Categoria
+
+        fields = ['nombre']
+
+        widgets = {
+            'nombre': forms.TextInput(
+                attrs={
+                    'class': 'form-control'
+                }
+            )
+        }            
