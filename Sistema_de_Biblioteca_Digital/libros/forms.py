@@ -20,6 +20,7 @@ class LibroForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'form-control'
             })
+        self.fields['disponibles'].disabled = True
 
 class AutorForm(forms.ModelForm):
 
