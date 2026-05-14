@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import LibroForm
+from .forms import (LibroForm, AutorForm, CategoriaForm)
 from .models import (Libro,Autor,Categoria )
 from django.shortcuts import get_object_or_404
 
@@ -125,3 +125,153 @@ def lista_categorias(request):
             'categorias': categorias
         }
     )
+@login_required
+def crear_autor(request):
+
+    form = AutorForm(request.POST or None)
+
+    if form.is_valid():
+
+        form.save()
+
+        messages.success(
+            request,
+            'Autor creado correctamente.'
+        )
+
+        return redirect('lista_autores')
+
+    return render(
+        request,
+        'libros/crear_autor.html',
+        {
+            'form': form
+        }
+    )
+
+
+@login_required
+def editar_autor(request, autor_id):
+
+    autor = get_object_or_404(
+        Autor,
+        id=autor_id
+    )
+
+    form = AutorForm(
+        request.POST or None,
+        instance=autor
+    )
+
+    if form.is_valid():
+
+        form.save()
+
+        messages.success(
+            request,
+            'Autor actualizado correctamente.'
+        )
+
+        return redirect('lista_autores')
+
+    return render(
+        request,
+        'libros/crear_autor.html',
+        {
+            'form': form
+        }
+    )
+
+
+@login_required
+def eliminar_autor(request, autor_id):
+
+    autor = get_object_or_404(
+        Autor,
+        id=autor_id
+    )
+
+    autor.delete()
+
+    messages.success(
+        request,
+        'Autor eliminado correctamente.'
+    )
+
+    return redirect('lista_autores')
+
+# categorias
+@login_required
+def crear_categoria(request):
+
+    form = CategoriaForm(request.POST or None)
+
+    if form.is_valid():
+
+        form.save()
+
+        messages.success(
+            request,
+            'Categoría creada correctamente.'
+        )
+
+        return redirect('lista_categorias')
+
+    return render(
+        request,
+        'libros/crear_categoria.html',
+        {
+            'form': form
+        }
+    )
+
+
+@login_required
+def editar_categoria(request, categoria_id):
+
+    categoria = get_object_or_404(
+        Categoria,
+        id=categoria_id
+    )
+
+    form = CategoriaForm(
+        request.POST or None,
+        instance=categoria
+    )
+
+    if form.is_valid():
+
+        form.save()
+
+        messages.success(
+            request,
+            'Categoría actualizada correctamente.'
+        )
+
+        return redirect('lista_categorias')
+
+    return render(
+        request,
+        'libros/crear_categoria.html',
+        {
+            'form': form
+        }
+    )
+
+
+@login_required
+def eliminar_categoria(request, categoria_id):
+
+    categoria = get_object_or_404(
+        Categoria,
+        id=categoria_id
+    )
+
+    categoria.delete()
+
+    messages.success(
+        request,
+        'Categoría eliminada correctamente.'
+    )
+
+    return redirect('lista_categorias')

@@ -35,4 +35,40 @@ urlpatterns = [
         name='lista_categorias'
     ),
 
+    path(
+    'autores/nuevo/',
+    views.crear_autor,
+    name='crear_autor'
+    ),
+
+    path(
+        'autores/editar/<int:autor_id>/',
+        views.editar_autor,
+        name='editar_autor'
+    ),
+
+    path(
+        'autores/eliminar/<int:autor_id>/',
+        views.eliminar_autor,
+        name='eliminar_autor'
+    ),
+
+    path(
+        'categorias/nueva/',
+        views.crear_categoria,
+        name='crear_categoria'
+    ),
+
+    path(
+        'categorias/editar/<int:categoria_id>/',
+        views.editar_categoria,
+        name='editar_categoria'
+    ),
+
+    path(
+        'categorias/eliminar/<int:categoria_id>/',
+        views.eliminar_categoria,
+        name='eliminar_categoria'
+    ),
+
 ]
