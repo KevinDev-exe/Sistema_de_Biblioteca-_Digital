@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="mb-4">
+
+        <h2>
+            Hola {{request.user.perfil.primer_nombre}}
+        </h2>
+
+        {% if activos > 0 %}
+
+        <div class="alert alert-primary shadow-sm">
+
+            📚 Tienes {{activos}} libro(s) prestado(s)
+
+        </div>
+
+        {% elif retrasados > 0 %}
+
+        <div class="alert alert-danger shadow-sm">
+
+            ⚠️ Tienes libros vencidos
+
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-success shadow-sm">
+
+            ✅ No tienes préstamos pendientes
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0 p-4 text-center">
+
+                <h6>📖 Activos</h6>
+
+                <h1>{{activos}}</h1>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0 p-4 text-center">
+
+                <h6>⏰ Retrasados</h6>
+
+                <h1>{{retrasados}}</h1>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0 p-4 text-center">
+
+                <h6>✅ Devueltos</h6>
+
+                <h1>{{devueltos}}</h1>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow border-0 p-4 text-center">
+
+                <h6>📚 Biblioteca</h6>
+
+                <h1>{{total_libros}}</h1>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="card shadow border-0">
+
+        <div class="card-body">
+
+            <h4>
+
+                📊 Libros más solicitados
+
+            </h4>
+
+            <canvas id="grafica"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const ctx = document.getElementById("grafica");
+
+        new Chart(ctx, {
+
+            type: "bar",
+
+            data: {
+
+                labels: JSON.parse('{{ labels|escapejs }}'),
+
+                datasets: [{
+
+                    label: "Cantidad de préstamos",
+
+                    data: JSON.parse('{{ data|escapejs }}')
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body p-4">
+
+        <h1>
+            Editar usuario
+        </h1>
+
+        <p class="text-muted">
+            Actualiza rol y estado del usuario.
+        </p>
+
+        <h5 class="mb-4">
+
+            {{ usuario.username }}
+
+        </h5>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Rol
+                </label>
+
+                {{ form.rol }}
+
+            </div>
+
+            <div class="form-check mb-3">
+
+                {{ form.sancionado }}
+
+                <label class="form-check-label">
+                    Usuario sancionado
+                </label>
+
+            </div>
+
+            <div class="form-check mb-3">
+
+                {{ form.activo }}
+
+                <label class="form-check-label">
+                    Usuario activo
+                </label>
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Guardar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
