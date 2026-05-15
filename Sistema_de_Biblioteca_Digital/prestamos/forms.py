@@ -29,6 +29,18 @@ class PrestamoForm(forms.ModelForm):
         return fecha
 
 
+class PrestamoEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Prestamo
+        fields = ['estado', 'fecha_devolucion', 'multa', 'observaciones']
+        widgets = {
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'fecha_devolucion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}, format='%Y-%m-%d'),
+            'multa': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
 class DevolucionForm(forms.ModelForm):
 
     class Meta:

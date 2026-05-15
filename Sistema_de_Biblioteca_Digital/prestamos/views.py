@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.conf import settings
 from datetime import timedelta
+import csv
 
 from .models import Prestamo
-from .forms import PrestamoForm, DevolucionForm
+from .forms import PrestamoForm, DevolucionForm, PrestamoEditForm
 from libros.models import Libro
 
 
@@ -118,7 +122,20 @@ def cancelar_prestamo(request, prestamo_id):
 
         if prestamo.estado == 'PENDIENTE':
 
-            prestamo.delete()
+            prestamo.estado = 'CANCELADO'
+            prestamo.save()
+
+            if request.user.perfil.rol == 'ADMIN':
+                try:
+                    send_mail(
+                        'Tu solicitud de préstamo ha sido cancelada',
+                        f'Hola {prestamo.usuario.username},\n\nTu solicitud de préstamo para el libro "{prestamo.libro.titulo}" ha sido cancelada por el bibliotecario.\n\nSaludos.',
+                        settings.DEFAULT_FROM_EMAIL,
+                        [prestamo.usuario.email],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
 
             messages.success(
                 request,
@@ -249,3 +266,103 @@ def detalle_prestamo(request, prestamo_id):
             'prestamo': prestamo
         }
     )
+
+@login_required
+def editar_prestamo(request, prestamo_id):
+
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if request.method == 'POST':
+        form = PrestamoEditForm(request.POST, instance=prestamo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Préstamo actualizado correctamente.')
+            return redirect('lista_prestamos')
+    else:
+        form = PrestamoEditForm(instance=prestamo)
+
+    return render(
+        request,
+        'prestamos/form_prestamo.html',
+        {
+            'form': form,
+            'titulo': 'Editar préstamo'
+        }
+    )
+
+@login_required
+def exportar_prestamos_csv(request):
+    
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+        
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="prestamos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Libro', 'Usuario', 'Fecha Préstamo', 'Fecha Devolución', 'Fecha Entrega', 'Estado', 'Multa'])
+
+    prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    for p in prestamos:
+        writer.writerow([
+            p.libro.titulo,
+            p.usuario.username,
+            p.fecha_prestamo,
+            p.fecha_devolucion,
+            p.fecha_entrega if p.fecha_entrega else 'No entregado',
+            p.get_estado_display(),
+            p.multa
+        ])
+
+    return response
+
+@login_required
+def exportar_prestamos_pdf(request):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+    import io
+
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.setTitle("Reporte de Préstamos")
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "Reporte de Préstamos")
+
+    p.setFont("Helvetica", 10)
+    y = 720
+    prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    p.drawString(50, y, "Libro")
+    p.drawString(250, y, "Usuario")
+    p.drawString(350, y, "Fecha Dev.")
+    p.drawString(450, y, "Estado")
+    p.drawString(520, y, "Multa")
+    y -= 20
+
+    for prestamo in prestamos:
+        p.drawString(50, y, str(prestamo.libro.titulo)[:40])
+        p.drawString(250, y, str(prestamo.usuario.username))
+        p.drawString(350, y, str(prestamo.fecha_devolucion))
+        p.drawString(450, y, prestamo.get_estado_display())
+        p.drawString(520, y, f"${prestamo.multa}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            p.setFont("Helvetica", 10)
+            y = 750
+
+    p.showPage()
+    p.save()
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="prestamos.pdf"'
+    return response
