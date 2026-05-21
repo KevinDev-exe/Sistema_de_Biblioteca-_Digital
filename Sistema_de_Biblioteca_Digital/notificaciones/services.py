@@ -27,21 +27,28 @@ class ServicioNotificaciones:
     def enviar_notificacion(notificacion):
         """Envía una notificación por email"""
         try:
-            # Diseño HTML para el correo
             html_content = f"""
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                <div style="background-color: #2563eb; color: white; padding: 24px; text-align: center;">
-                    <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Biblioteca Digital</h2>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+            </head>
+            <body style="margin: 0; padding: 0; background-color: #f3f4f6;">
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <div style="background-color: #0d6efd; color: white; padding: 24px; text-align: center;">
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">Biblioteca Digital</h2>
+                    </div>
+                    <div style="padding: 32px; background-color: #ffffff; color: #334155;">
+                        <h3 style="margin-top: 0; color: #111827; font-size: 20px;">{notificacion.asunto}</h3>
+                        <p style="white-space: pre-line; line-height: 1.7; font-size: 16px;">{notificacion.mensaje}</p>
+                    </div>
+                    <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #e2e8f0;">
+                        <p style="margin: 0;">Este es un mensaje automático del Sistema de Biblioteca Digital.</p>
+                        <p style="margin: 5px 0 0 0;">Por favor no respondas a este correo.</p>
+                    </div>
                 </div>
-                <div style="padding: 32px; background-color: #ffffff; color: #334155;">
-                    <h3 style="margin-top: 0; color: #0f172a; font-size: 20px;">{notificacion.asunto}</h3>
-                    <p style="white-space: pre-line; line-height: 1.7; font-size: 16px;">{notificacion.mensaje}</p>
-                </div>
-                <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 13px; border-top: 1px solid #e2e8f0;">
-                    <p style="margin: 0;">Este es un mensaje automático del Sistema de Biblioteca Digital.</p>
-                    <p style="margin: 5px 0 0 0;">Por favor no respondas a este correo.</p>
-                </div>
-            </div>
+            </body>
+            </html>
             """
 
             send_mail(
