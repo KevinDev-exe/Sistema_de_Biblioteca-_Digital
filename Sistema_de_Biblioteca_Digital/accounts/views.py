@@ -161,7 +161,8 @@ def password_reset_view(request):
                 form.save(
                     request=request,
                     use_https=False,
-                    email_template_name='accounts/password_reset_email.html'
+                    email_template_name='accounts/password_reset_email_txt.html',
+                    html_email_template_name='accounts/password_reset_email.html'
                 )
 
                 request.session['reset_email'] = email
