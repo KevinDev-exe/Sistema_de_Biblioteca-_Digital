@@ -24,6 +24,12 @@ urlpatterns = [
     ),
 
     path(
+        'eliminar/<int:libro_id>/',
+        views.eliminar_libro,
+        name='eliminar_libro'
+    ),
+
+    path(
     'autores/',
     views.lista_autores,
     name='lista_autores'

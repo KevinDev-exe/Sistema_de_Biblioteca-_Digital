@@ -115,6 +115,12 @@
 
                         </a>
 
+                        <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este libro?')">
+
+                            Eliminar
+
+                        </a>
+
                         {% endif %}
 
 

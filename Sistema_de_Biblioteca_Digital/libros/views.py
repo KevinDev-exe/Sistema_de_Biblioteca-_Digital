@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 
 from .forms import LibroForm, AutorForm, CategoriaForm
 from .models import Libro, Autor, Categoria
@@ -129,6 +130,41 @@ def editar_libro(request, libro_id):
         }
     )
 
+
+@login_required
+def eliminar_libro(request, libro_id):
+
+    if not es_admin(request.user):
+
+        messages.error(
+            request,
+            'No tienes permisos para eliminar libros.'
+        )
+
+        return redirect('lista_libros')
+
+    libro = get_object_or_404(
+        Libro,
+        id=libro_id
+    )
+
+    try:
+
+        libro.delete()
+
+        messages.success(
+            request,
+            'Libro eliminado correctamente.'
+        )
+
+    except ProtectedError:
+
+        messages.error(
+            request,
+            'No se puede eliminar este libro porque tiene historial de préstamos o solicitudes asociadas.'
+        )
+
+    return redirect('lista_libros')
 
 @login_required
 def lista_autores(request):
