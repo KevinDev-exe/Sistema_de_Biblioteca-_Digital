@@ -30,14 +30,14 @@
         <form method="GET" class="row g-3 align-items-center">
             <div class="col-md-5">
                 <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="q" class="form-control bg-light" placeholder="Buscar por libro o usuario..." value="{{ query }}">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control bg-white border-start-0 ps-0" placeholder="Buscar por libro o usuario..." value="{{ query }}">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-funnel"></i> Estado</span>
-                    <select name="estado" class="form-select bg-light">
+                    <span class="input-group-text bg-white text-muted"><i class="bi bi-funnel"></i> Estado</span>
+                    <select name="estado" class="form-select bg-white">
                         <option value="">Todos</option>
                         {% for valor, etiqueta in ESTADOS %}
                             <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>{{ etiqueta }}</option>
@@ -45,8 +45,11 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold shadow-sm">Buscar</button>
+                <a href="{% url 'lista_prestamos' %}" class="btn btn-light border text-secondary shadow-sm" title="Limpiar filtros / Refrescar">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </a>
             </div>
         </form>
     </div>
