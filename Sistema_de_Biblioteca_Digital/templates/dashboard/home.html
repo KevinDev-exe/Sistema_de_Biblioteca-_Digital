@@ -1,82 +1,104 @@
 {% extends "base.html" %}
 {% block title %}Dashboard | Biblioteca Digital{% endblock %}
 {% block content %}
-<div class="page-header align-items-center mb-4">
+<div class="page-header align-items-end mb-5">
   <div>
-    <h1 class="fw-extrabold text-indigo-950">Dashboard</h1>
-    <p class="text-secondary mb-0">Resumen y métricas de operación de la biblioteca digital.</p>
+    <h1 class="fw-extrabold text-dark mb-1">Visión General</h1>
+    <p class="text-secondary mb-0">Monitoreo en tiempo real y analíticas de la biblioteca.</p>
   </div>
   <a class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" href="{% url 'reportes:index' %}">
-    <i class="bi bi-file-earmark-bar-graph-fill"></i>
-    <span>Módulo de Reportes</span>
+    <i class="bi bi-cloud-download"></i>
+    <span>Generar Reportes</span>
   </a>
 </div>
 
-<div class="stats-grid mb-4">
+<!-- Grid de Estadísticas Premium (Cuadritos Vibrantes) -->
+<div class="row g-3 mb-5">
   <!-- Card 1: Total Libros -->
-  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
-    <div>
-      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Total libros</span>
-      <strong class="d-block fs-2 mt-1 text-primary" style="font-weight: 800;">{{ total_libros }}</strong>
-    </div>
-    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
-      <i class="bi bi-book fs-4"></i>
+  <div class="col-xl-3 col-md-6">
+    <div class="card text-white border-0 shadow-sm transition-hover h-100" style="background: linear-gradient(135deg, #1e70f5 0%, #1752b8 100%); border-radius: 12px;">
+      <div class="card-body p-4 position-relative overflow-hidden">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">
+            <i class="bi bi-book me-1"></i> Total Libros
+          </span>
+        </div>
+        <h2 class="display-5 fw-bolder text-white mb-3">{{ total_libros }}</h1>
+        <div class="small text-white-50">
+          Biblioteca activa
+        </div>
+        <i class="bi bi-journal-richtext position-absolute opacity-25" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+      </div>
     </div>
   </div>
 
   <!-- Card 2: Usuarios -->
-  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #e6fcf5 0%, #c3fae8 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
-    <div>
-      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Usuarios</span>
-      <strong class="d-block fs-2 mt-1 text-success" style="font-weight: 800; color: #12b886 !important;">{{ total_usuarios }}</strong>
-    </div>
-    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #12b886;">
-      <i class="bi bi-people fs-4"></i>
+  <div class="col-xl-3 col-md-6">
+    <div class="card text-white border-0 shadow-sm transition-hover h-100" style="background: linear-gradient(135deg, #0dcaf0 0%, #08a0bf 100%); border-radius: 12px;">
+      <div class="card-body p-4 position-relative overflow-hidden">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">
+            <i class="bi bi-people me-1"></i> Lectores
+          </span>
+        </div>
+        <h2 class="display-5 fw-bolder text-white mb-3">{{ total_usuarios }}</h1>
+        <div class="small text-white-50">
+          Usuarios registrados
+        </div>
+        <i class="bi bi-person-hearts position-absolute opacity-25" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+      </div>
     </div>
   </div>
 
   <!-- Card 3: Libros Prestados -->
-  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
-    <div>
-      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Prestados</span>
-      <strong class="d-block fs-2 mt-1 text-warning" style="font-weight: 800; color: #f08c00 !important;">{{ libros_prestados }}</strong>
-    </div>
-    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #f08c00;">
-      <i class="bi bi-arrow-left-right fs-4"></i>
-    </div>
-  </div>
-
-  <!-- Card 4: Reservas Activas -->
-  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #e3fafc 0%, #c5f6fa 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
-    <div>
-      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Reservas activas</span>
-      <strong class="d-block fs-2 mt-1 text-info" style="font-weight: 800; color: #0c8599 !important;">{{ reservas_activas }}</strong>
-    </div>
-    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #0c8599;">
-      <i class="bi bi-bookmark-check fs-4"></i>
+  <div class="col-xl-3 col-md-6">
+    <div class="card text-white border-0 shadow-sm transition-hover h-100" style="background: linear-gradient(135deg, #198754 0%, #12663e 100%); border-radius: 12px;">
+      <div class="card-body p-4 position-relative overflow-hidden">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 1px;">
+            <i class="bi bi-arrow-left-right me-1"></i> En Préstamo
+          </span>
+        </div>
+        <h2 class="display-5 fw-bolder text-white mb-3">{{ libros_prestados }}</h1>
+        <div class="small text-white-50">
+          Circulación actual
+        </div>
+        <i class="bi bi-arrow-repeat position-absolute opacity-25" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+      </div>
     </div>
   </div>
 
-  <!-- Card 5: Sancionados -->
-  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
-    <div>
-      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Sancionados</span>
-      <strong class="d-block fs-2 mt-1 text-danger" style="font-weight: 800; color: #fa5252 !important;">{{ usuarios_sancionados }}</strong>
-    </div>
-    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #fa5252;">
-      <i class="bi bi-exclamation-triangle fs-4"></i>
+  <!-- Card 4: Sancionados / Reservas -->
+  <div class="col-xl-3 col-md-6">
+    <div class="card text-white border-0 shadow-sm transition-hover h-100" style="background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%); border-radius: 12px;">
+      <div class="card-body p-4 position-relative overflow-hidden">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-dark-50 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 1px; color: rgba(0,0,0,0.5);">
+            <i class="bi bi-exclamation-triangle me-1"></i> Sanciones / Reservas
+          </span>
+        </div>
+        <h2 class="display-5 fw-bolder text-dark mb-3">{{ usuarios_sancionados }} <span class="fs-4 text-dark-50">/ {{ reservas_activas }}</span></h1>
+        <div class="small text-dark-50" style="color: rgba(0,0,0,0.5);">
+          Atención requerida
+        </div>
+        <i class="bi bi-shield-exclamation position-absolute opacity-25 text-dark" style="font-size: 5rem; right: -10px; bottom: -15px;"></i>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Gráficos Principales -->
 <div class="row g-4 mb-4">
   <!-- Chart: Prestamos por mes -->
   <div class="col-xl-8 col-lg-7">
-    <div class="panel border-0 shadow-sm p-4 h-100">
-      <div class="panel-header border-0 pb-0 mb-3">
-        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Tendencia de Préstamos por Mes</h2>
+    <div class="panel h-100">
+      <div class="panel-header">
+        <h2 class="h5 fw-bold text-dark mb-0">Tendencia de Préstamos Anual</h2>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-light rounded-pill" type="button"><i class="bi bi-three-dots"></i></button>
+        </div>
       </div>
-      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+      <div class="chart-container mt-4" style="position: relative; height: 220px; width: 100%;">
         <canvas id="prestamosMesChart"></canvas>
       </div>
     </div>
@@ -84,25 +106,25 @@
 
   <!-- Chart: Categorias -->
   <div class="col-xl-4 col-lg-5">
-    <div class="panel border-0 shadow-sm p-4 h-100">
-      <div class="panel-header border-0 pb-0 mb-3">
-        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Distribución por Categorías</h2>
+    <div class="panel h-100">
+      <div class="panel-header">
+        <h2 class="h5 fw-bold text-dark mb-0">Inventario por Categoría</h2>
       </div>
-      <div class="chart-container d-flex align-items-center justify-content-center" style="position: relative; height: 260px; width: 100%;">
+      <div class="chart-container d-flex align-items-center justify-content-center mt-3" style="position: relative; height: 200px; width: 100%;">
         <canvas id="categoriasChart"></canvas>
       </div>
     </div>
   </div>
 </div>
 
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-5">
   <!-- Chart: Libros mas reservados -->
   <div class="col-lg-6">
-    <div class="panel border-0 shadow-sm p-4 h-100">
-      <div class="panel-header border-0 pb-0 mb-3">
-        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Libros más Reservados</h2>
+    <div class="panel h-100">
+      <div class="panel-header">
+        <h2 class="h5 fw-bold text-dark mb-0">Títulos más Demandados</h2>
       </div>
-      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+      <div class="chart-container mt-3" style="position: relative; height: 200px; width: 100%;">
         <canvas id="reservasChart"></canvas>
       </div>
     </div>
@@ -110,55 +132,70 @@
 
   <!-- Chart: Autor mas leido -->
   <div class="col-lg-6">
-    <div class="panel border-0 shadow-sm p-4 h-100">
-      <div class="panel-header border-0 pb-0 mb-3">
-        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Autores más Leídos (Préstamos)</h2>
+    <div class="panel h-100">
+      <div class="panel-header">
+        <h2 class="h5 fw-bold text-dark mb-0">Top Autores Leídos</h2>
       </div>
-      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+      <div class="chart-container mt-3" style="position: relative; height: 200px; width: 100%;">
         <canvas id="autoresChart"></canvas>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Actividad Reciente -->
 <div class="row g-4">
-  <!-- Recent Activity -->
   <div class="col-12">
-    <div class="panel border-0 shadow-sm p-4">
-      <div class="panel-header border-0 pb-0 mb-3">
-        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Actividad Reciente en el Sistema</h2>
+    <div class="panel">
+      <div class="panel-header mb-4">
+        <h2 class="h5 fw-bold text-dark mb-0">Historial de Transacciones</h2>
+        <a href="{% url 'lista_prestamos' %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver todo</a>
       </div>
       <div class="activity-list">
         {% for item in actividad %}
-        <div class="activity-item py-3 px-2 d-flex align-items-center justify-content-between border-bottom border-light">
-          <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center 
-              {% if item.fecha_reserva %}bg-info-subtle text-info{% else %}bg-primary-subtle text-primary{% endif %}" style="width: 40px; height: 40px;">
+        <div class="activity-item py-3 px-3 rounded-3 mb-2 transition-hover" style="background: rgba(248, 250, 252, 0.5);">
+          <div class="d-flex align-items-center gap-4">
+            <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm
+              {% if item.fecha_reserva %}bg-info text-white{% else %}bg-primary text-white{% endif %}" style="width: 46px; height: 46px;">
               {% if item.fecha_reserva %}
-              <i class="bi bi-bookmark-fill fs-5"></i>
+              <i class="bi bi-bookmark-star-fill fs-5"></i>
               {% else %}
               <i class="bi bi-arrow-left-right fs-5"></i>
               {% endif %}
             </div>
             <div>
-              <strong class="d-block text-indigo-950">{{ item.libro }}</strong>
-              <span class="text-secondary small">{{ item.usuario }} · 
-                <span class="badge {% if item.estado == 'activa' or item.estado == 'activo' or item.estado == 'ACTIVO' %}status-activo{% elif item.estado == 'devuelto' or item.estado == 'DEVUELTO' %}status-devuelto{% elif item.estado == 'retrasado' or item.estado == 'RETRASADO' %}status-retrasado{% else %}status-prestado{% endif %}">
-                  {{ item.get_estado_display }}
+              <strong class="d-block text-dark fs-6 mb-1">{{ item.libro }}</strong>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-secondary fw-medium small"><i class="bi bi-person-circle me-1"></i>{{ item.usuario }}</span>
+                <span class="text-muted small px-1">•</span>
+                <span class="badge text-dark {% if item.estado == 'activa' or item.estado == 'activo' or item.estado == 'ACTIVO' %}status-activo{% elif item.estado == 'devuelto' or item.estado == 'DEVUELTO' %}status-devuelto{% elif item.estado == 'retrasado' or item.estado == 'RETRASADO' %}status-retrasado{% else %}status-prestado{% endif %}" style="color: inherit !important;">
+                  {{ item.get_estado_display|default:item.estado|upper }}
                 </span>
-              </span>
+              </div>
             </div>
           </div>
-          <small class="text-muted fw-medium">
-            {% if item.fecha_reserva %}
-              <i class="bi bi-clock me-1"></i>{{ item.fecha_reserva|date:"d/m/Y H:i" }}
-            {% else %}
-              <i class="bi bi-clock me-1"></i>{{ item.creado|date:"d/m/Y H:i" }}
-            {% endif %}
-          </small>
+          <div class="text-end">
+            <small class="text-muted fw-bold d-block">
+              {% if item.fecha_reserva %}
+                {{ item.fecha_reserva|date:"d M" }}
+              {% else %}
+                {{ item.creado|date:"d M" }}
+              {% endif %}
+            </small>
+            <small class="text-secondary" style="font-size: 0.75rem;">
+              {% if item.fecha_reserva %}
+                {{ item.fecha_reserva|date:"H:i" }}
+              {% else %}
+                {{ item.creado|date:"H:i" }}
+              {% endif %}
+            </small>
+          </div>
         </div>
         {% empty %}
-        <p class="text-muted mb-0 py-3 text-center">Sin actividad registrada en las últimas horas.</p>
+        <div class="text-center py-5">
+          <div class="text-muted mb-3"><i class="bi bi-inbox fs-1"></i></div>
+          <p class="text-muted mb-0 fw-medium">El sistema no registra actividad reciente.</p>
+        </div>
         {% endfor %}
       </div>
     </div>
@@ -174,6 +211,13 @@
     categorias: "{% url 'dashboard:chart_categorias' %}",
     autores: "{% url 'dashboard:chart_autores_leidos' %}"
   };
+  
+  // Si los gráficos no se ven muy bien con la fuente nueva, podemos 
+  // configurar Chart.js para que use la nueva fuente aquí.
+  Chart.defaults.font.family = "'Outfit', 'Inter', sans-serif";
+  Chart.defaults.color = "#64748b";
+  Chart.defaults.scale.grid.color = "rgba(226, 232, 240, 0.5)";
+
   initDashboardCharts();
 </script>
 {% endblock %}

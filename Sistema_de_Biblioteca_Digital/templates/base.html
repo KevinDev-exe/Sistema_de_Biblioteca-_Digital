@@ -1,201 +1,153 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>
-        Biblioteca Digital
-    </title>
-
+    <title>Biblioteca Digital Premium</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
 </head>
-
-<body>
-
+<body class="bg-gradient-modern">
     {% if user.is_authenticated %}
+    <div class="app-layout">
+        <!-- Sidebar Flotante -->
+        <aside class="modern-sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="bi bi-book-half"></i></div>
+                <h3 class="brand-text">Biblio<span class="text-primary">Pro</span></h3>
+            </div>
 
-    <div class="d-flex">
-
-        <div class="sidebar p-3">
-
-            <h3 class="text-white mb-4">
-                Biblioteca Digital
-            </h3>
-
-            <ul class="nav flex-column">
-
+            <p class="sidebar-heading">MENU PRINCIPAL</p>
+            <ul class="nav flex-column sidebar-nav">
                 <li class="nav-item">
-
-                <li class="nav-item">
-
-                    <a href="{% url 'dashboard' %}" class="nav-link">
-
-                        <i class="bi bi-speedometer2"></i>
-
-                        Dashboard
-
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
                     </a>
-
                 </li>
-
-                </li>
-
                 <li class="nav-item">
-
-                    <a href="{% url 'lista_libros' %}" class="nav-link">
-                        <i class="bi bi-book"></i>
-                        Libros
+                    <a href="{% url 'lista_libros' %}" class="nav-link {% if 'libro' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-journals"></i><span>Libros</span>
                     </a>
-
                 </li>
-
                 <li class="nav-item">
-
-                    <a href="{% url 'lista_autores' %}" class="nav-link">
-                        <i class="bi bi-people"></i>
-                        Autores
+                    <a href="{% url 'lista_autores' %}" class="nav-link {% if 'autor' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-people-fill"></i><span>Autores</span>
                     </a>
-
                 </li>
-
                 <li class="nav-item">
-
-                    <a href="{% url 'lista_categorias' %}" class="nav-link">
-                        <i class="bi bi-tags"></i>
-                        Categorías
+                    <a href="{% url 'lista_categorias' %}" class="nav-link {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-tags-fill"></i><span>Categorías</span>
                     </a>
-
                 </li>
-
-                </li>
-
                 <li class="nav-item">
-                    <a href="{% url 'lista_prestamos' %}" class="nav-link">
-                        <i class="bi bi-arrow-left-right"></i>
-                        Préstamos
+                    <a href="{% url 'lista_prestamos' %}" class="nav-link {% if 'prestamo' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-arrow-left-right"></i><span>Préstamos</span>
                     </a>
                 </li>
 
                 {% if user.perfil.rol == 'ADMIN' %}
-
+                <p class="sidebar-heading mt-4">ADMINISTRACIÓN</p>
                 <li class="nav-item">
-
-                    <a href="{% url 'usuarios' %}" class="nav-link">
-                        <i class="bi bi-person-gear"></i>
-                        Usuarios
-                    </a>
-
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'reservas:list' %}" class="nav-link">
-                        <i class="bi bi-bookmark-check"></i>
-                        Reservas
+                    <a href="{% url 'usuarios' %}" class="nav-link {% if 'usuario' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-person-badge-fill"></i><span>Usuarios</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
-                    <a href="{% url 'reportes:index' %}" class="nav-link">
-                        <i class="bi bi-file-earmark-bar-graph"></i>
-                        Reportes
+                    <a href="{% url 'reservas:list' %}" class="nav-link {% if 'reserva' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-bookmark-star-fill"></i><span>Reservas</span>
                     </a>
                 </li>
-
+                <li class="nav-item">
+                    <a href="{% url 'reportes:index' %}" class="nav-link {% if 'reporte' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="bi bi-bar-chart-line-fill"></i><span>Reportes</span>
+                    </a>
+                </li>
                 {% else %}
-
+                <p class="sidebar-heading mt-4">MI ESPACIO</p>
                 <li class="nav-item">
                     <a href="{% url 'reservas:mis_reservas' %}" class="nav-link">
-                        <i class="bi bi-bookmark-check"></i>
-                        Mis Reservas
+                        <i class="bi bi-bookmark-heart-fill"></i><span>Mis Reservas</span>
                     </a>
                 </li>
-
                 {% endif %}
-
             </ul>
-
-        </div>
-
-        <div class="main-content">
-
-            <div class="topbar d-flex justify-content-between align-items-center rounded mb-4">
-
-                <h5 class="m-0">
-                    Bienvenido,
-                    {{ user.username }}
-                </h5>
-
-                <div>
-
-                    <a href="{% url 'perfil' %}" class="btn btn-outline-primary btn-sm">
-                        Mi perfil
-                    </a>
-
-                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
-
-                        {% csrf_token %}
-
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Cerrar sesión
-                        </button>
-
-                    </form>
-
+            
+            <div class="sidebar-footer mt-auto">
+                <div class="user-info-card">
+                    <div class="user-avatar">{{ user.username|make_list|first|upper }}</div>
+                    <div class="user-details">
+                        <span class="user-name">{{ user.first_name|default:user.username }}</span>
+                        <span class="user-role">{{ user.perfil.get_rol_display }}</span>
+                    </div>
                 </div>
-
             </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content-wrapper">
+            <!-- Topbar Elegante -->
+            <header class="modern-topbar">
+                <div class="topbar-left">
+                    <h2 class="page-greeting">¡Hola, {{ user.first_name|default:user.username }}! 👋</h2>
+                    <p class="page-subtitle text-muted mb-0">Bienvenido de nuevo a tu panel de control.</p>
+                </div>
+                <div class="topbar-right">
+                    <a href="{% url 'perfil' %}" class="btn-icon" data-bs-toggle="tooltip" title="Mi Perfil">
+                        <i class="bi bi-gear"></i>
+                    </a>
+                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout rounded-pill px-4">
+                            <i class="bi bi-box-arrow-right me-2"></i>Salir
+                        </button>
+                    </form>
+                </div>
+            </header>
 
             {% if messages %}
-
-            {% for message in messages %}
-
-            <div class="alert alert-success">
-
-                {{ message }}
-
+            <div class="messages-container mt-4">
+                {% for message in messages %}
+                <div class="alert alert-modern alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill fs-4 me-3"></i>{% endif %}
+                        {% if message.tags == 'error' %}<i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>{% endif %}
+                        {% if message.tags == 'warning' %}<i class="bi bi-info-circle-fill fs-4 me-3"></i>{% endif %}
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
             </div>
-
-            {% endfor %}
-
             {% endif %}
 
-            {% block content %}
-            {% endblock %}
-
-        </div>
-
+            <!-- Area Dinámica del Proyecto -->
+            <div class="content-area mt-4">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
-
     {% else %}
-
-    <div class="container">
-
-        {% block auth_content %}
-        {% endblock %}
-
+    <div class="auth-layout">
+        {% block auth_content %}{% endblock %}
     </div>
-
     {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="{% static 'js/app.js' %}"></script>
+    <script>
+        // Activar tooltips de bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
     {% block scripts %}{% endblock %}
 </body>
-
 </html>
