@@ -1,1 +1,69 @@
-# Sistema_de_Biblioteca_Digital 
+# Sistema de Biblioteca Digital
+
+Sistema web para la gestión de una biblioteca digital desarrollado con Django. Permite administrar libros, préstamos, reservas, notificaciones y reportes con roles diferenciados para administradores/bibliotecarios y lectores.
+
+## Características
+
+- Gestión de libros (CRUD con portada, autor, editorial, categoría)
+- Préstamos y devoluciones con control de fechas y sanciones
+- Reservas de libros
+- Dashboard con estadísticas y gráficos
+- Notificaciones por correo electrónico
+- Reportes exportables
+- Roles: Administrador/Bibliotecario y Lector
+- Registro de usuarios
+
+## Requisitos
+
+- Python 3.10+
+- Django 6.0.5
+- Ver `requirements.txt` para dependencias completas
+
+## Instalación y ejecución
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/KevinDev-exe/Sistema_de_Biblioteca-_Digital.git
+cd "Sistema_de_Biblioteca_Digital/Sistema_de_Biblioteca_Digital"
+
+# Instalar dependencias
+pip install django
+pip install -r requirements.txt
+
+# Crear superusuario (opcional, si no existe)
+python manage.py createsuperuser
+
+# Iniciar servidor
+python manage.py runserver
+```
+
+El servidor se ejecutará en `http://127.0.0.1:8000/`
+
+## Credenciales predefinidas
+
+> **Nota:** Puedes crear tu propio usuario desde la página de registro o desde el panel de administrador. Desde el panel de administrador también puedes cambiar el rol de cualquier usuario (Administrador o Lector).
+
+### Administrador - Panel Django
+
+| Campo    | Valor            |
+|----------|------------------|
+| Usuario  | `________________` |
+| Clave    | `________________` |
+
+
+### Administrador - Biblioteca
+
+| Campo    | Valor            |
+|----------|------------------|
+| Usuario  | `________________` |
+| Clave    | `________________` |
+
+### Lector - Biblioteca
+
+| Campo    | Valor            |
+|----------|------------------|
+| Usuario  | `________________` |
+| Clave    | `________________` |
+
+## Estructura del proyecto
+
