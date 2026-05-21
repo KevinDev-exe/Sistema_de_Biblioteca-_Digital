@@ -1,8 +1,10 @@
-# Python
+# Python cache
 __pycache__/
-*.py[cod]
-*.sqlite3
+*.pyc
 
-# Entorno virtual
+# Base de datos
+db.sqlite3
+
+# Entornos
 venv/
 .env
