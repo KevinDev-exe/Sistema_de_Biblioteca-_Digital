@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header align-items-end mb-4">
 
     <div>
 
-        <h2>Libros</h2>
+        <h1 class="fw-extrabold text-dark mb-1">Libros</h1>
 
         <p class="text-muted">
             Biblioteca digital
@@ -31,7 +31,7 @@
 
     <div class="input-group">
 
-        <input type="text" name="buscar" class="form-control" placeholder="Buscar libro..."
+        <input type="text" name="buscar" class="form-control bg-light" placeholder="Buscar libro..."
             value="{{request.GET.buscar}}">
 
         <button class="btn btn-primary">
@@ -45,9 +45,9 @@
 </form>
 
 
-<div class="card shadow">
+<div class="panel border-0 shadow-sm table-panel mt-4">
 
-    <div class="card-body">
+    <div class="panel-body">
 
         <table class="table align-middle">
 
@@ -112,6 +112,12 @@
                         <a href="{% url 'editar_libro' libro.id %}" class="btn btn-warning btn-sm">
 
                             Editar
+
+                        </a>
+
+                        <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este libro?')">
+
+                            Eliminar
 
                         </a>
 
