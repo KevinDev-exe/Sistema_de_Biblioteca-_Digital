@@ -85,26 +85,50 @@
     
     <!-- Paginación -->
     {% if autores.has_other_pages %}
-    <div class="card-footer bg-light border-top p-3 d-flex justify-content-center">
-        <ul class="pagination pagination-sm mb-0 shadow-sm">
+    <div class="card-footer bg-white border-top-0 p-4 d-flex justify-content-center">
+        <ul class="pagination mb-0 gap-2">
             {% if autores.has_previous %}
-            <li class="page-item"><a class="page-link text-primary" href="?page={{ autores.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo; Anterior</a></li>
+            <li class="page-item">
+                <a class="page-link rounded-circle border-0 shadow-sm text-primary fw-bold transition-hover d-flex align-items-center justify-content-center" href="?page={{ autores.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" style="width: 40px; height: 40px;" title="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
             {% else %}
-            <li class="page-item disabled"><span class="page-link text-muted">&laquo; Anterior</span></li>
+            <li class="page-item disabled">
+                <span class="page-link rounded-circle border-0 text-muted bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-chevron-left"></i>
+                </span>
+            </li>
             {% endif %}
 
             {% for i in autores.paginator.page_range %}
                 {% if autores.number == i %}
-                <li class="page-item active"><span class="page-link border-primary bg-primary">{{ i }}</span></li>
+                <li class="page-item active">
+                    <span class="page-link rounded-circle border-0 bg-primary shadow d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                        {{ i }}
+                    </span>
+                </li>
                 {% else %}
-                <li class="page-item"><a class="page-link text-primary" href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}">{{ i }}</a></li>
+                <li class="page-item">
+                    <a class="page-link rounded-circle border-0 shadow-sm text-secondary fw-bold transition-hover d-flex align-items-center justify-content-center" href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}" style="width: 40px; height: 40px;">
+                        {{ i }}
+                    </a>
+                </li>
                 {% endif %}
             {% endfor %}
 
             {% if autores.has_next %}
-            <li class="page-item"><a class="page-link text-primary" href="?page={{ autores.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Siguiente &raquo;</a></li>
+            <li class="page-item">
+                <a class="page-link rounded-circle border-0 shadow-sm text-primary fw-bold transition-hover d-flex align-items-center justify-content-center" href="?page={{ autores.next_page_number }}{% if query %}&q={{ query }}{% endif %}" style="width: 40px; height: 40px;" title="Siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
             {% else %}
-            <li class="page-item disabled"><span class="page-link text-muted">Siguiente &raquo;</span></li>
+            <li class="page-item disabled">
+                <span class="page-link rounded-circle border-0 text-muted bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-chevron-right"></i>
+                </span>
+            </li>
             {% endif %}
         </ul>
     </div>
