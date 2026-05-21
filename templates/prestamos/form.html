@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Prestamo{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Prestamo</h1><p>Registra o actualiza un prestamo.</p></div></div>
+<div class="panel">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row g-3">
+      {% for field in form %}
+      <div class="col-md-6">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<div class="invalid-text">{{ error }}</div>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mt-4 d-flex gap-2"><button class="btn btn-primary">Guardar</button><a class="btn btn-outline-secondary" href="{% url 'prestamos:list' %}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}
+

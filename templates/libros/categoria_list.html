@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Categorias{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Categorias</h1><p>Clasificacion del catalogo.</p></div><a class="btn btn-primary" href="{% url 'libros:categoria_create' %}"><i class="bi bi-plus-lg"></i> Categoria</a></div>
+<form class="filter-bar mb-3"><input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Buscar categoria"><button class="btn btn-outline-primary"><i class="bi bi-search"></i></button></form>
+<div class="panel table-panel"><table class="table align-middle"><thead><tr><th>Nombre</th><th>Descripcion</th><th>Activo</th><th></th></tr></thead><tbody>{% for categoria in categorias %}<tr><td><strong>{{ categoria.nombre }}</strong></td><td>{{ categoria.descripcion|truncatechars:80 }}</td><td>{{ categoria.activo|yesno:"Si,No" }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'libros:categoria_update' categoria.pk %}"><i class="bi bi-pencil"></i></a> <a class="btn btn-sm btn-outline-danger" href="{% url 'libros:categoria_delete' categoria.pk %}"><i class="bi bi-trash"></i></a></td></tr>{% empty %}<tr><td colspan="4" class="text-center text-muted">Sin categorias.</td></tr>{% endfor %}</tbody></table></div>
+{% include "pagination.html" %}
+{% endblock %}
+

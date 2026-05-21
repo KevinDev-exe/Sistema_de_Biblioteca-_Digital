@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado{% endblock %}
+{% block content %}
+<div class="panel compact">
+  <h1>Acceso denegado</h1>
+  <p class="text-muted">Tu cuenta no tiene permisos para abrir esta seccion.</p>
+  <a class="btn btn-primary" href="{% url 'libros:catalogo' %}">Volver al catalogo</a>
+</div>
+{% endblock %}
+

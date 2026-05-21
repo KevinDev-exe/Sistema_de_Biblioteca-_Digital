@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Usuarios</h1><p>Control de roles, estado y sanciones.</p></div></div>
+<form class="filter-bar mb-3">
+  <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Buscar usuario, nombre o correo">
+  <select class="form-select" name="rol">
+    <option value="">Todos los roles</option>
+    <option value="admin" {% if request.GET.rol == "admin" %}selected{% endif %}>Administrador/Bibliotecario</option>
+    <option value="lector" {% if request.GET.rol == "lector" %}selected{% endif %}>Lector</option>
+  </select>
+  <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+</form>
+<div class="panel table-panel">
+  <table class="table align-middle">
+    <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Sancionado</th><th>Activo</th><th></th></tr></thead>
+    <tbody>
+      {% for usuario in usuarios %}
+      <tr>
+        <td><strong>{{ usuario.username }}</strong><br><span class="text-muted">{{ usuario.nombre }}</span></td>
+        <td>{{ usuario.email }}</td>
+        <td><span class="badge text-bg-secondary">{{ usuario.get_rol_display }}</span></td>
+        <td>{{ usuario.sancionado|yesno:"Si,No" }}</td>
+        <td>{{ usuario.is_active|yesno:"Si,No" }}</td>
+        <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'usuarios:update' usuario.pk %}"><i class="bi bi-pencil"></i></a></td>
+      </tr>
+      {% empty %}<tr><td colspan="6" class="text-center text-muted">Sin usuarios.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "pagination.html" %}
+{% endblock %}
+

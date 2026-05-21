@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: biblioteca-digital
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn Sistema_de_Biblioteca_Digital.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://biblioteca-digital.onrender.com"
+databases:
+  - name: biblioteca-digital-db
+    databaseName: biblioteca
+    user: biblioteca
+

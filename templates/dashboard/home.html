@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Biblioteca Digital{% endblock %}
+{% block content %}
+<div class="page-header align-items-center mb-4">
+  <div>
+    <h1 class="fw-extrabold text-indigo-950">Dashboard</h1>
+    <p class="text-secondary mb-0">Resumen y métricas de operación de la biblioteca digital.</p>
+  </div>
+  <a class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" href="{% url 'reportes:index' %}">
+    <i class="bi bi-file-earmark-bar-graph-fill"></i>
+    <span>Módulo de Reportes</span>
+  </a>
+</div>
+
+<div class="stats-grid mb-4">
+  <!-- Card 1: Total Libros -->
+  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
+    <div>
+      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Total libros</span>
+      <strong class="d-block fs-2 mt-1 text-primary" style="font-weight: 800;">{{ total_libros }}</strong>
+    </div>
+    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
+      <i class="bi bi-book fs-4"></i>
+    </div>
+  </div>
+
+  <!-- Card 2: Usuarios -->
+  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #e6fcf5 0%, #c3fae8 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
+    <div>
+      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Usuarios</span>
+      <strong class="d-block fs-2 mt-1 text-success" style="font-weight: 800; color: #12b886 !important;">{{ total_usuarios }}</strong>
+    </div>
+    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #12b886;">
+      <i class="bi bi-people fs-4"></i>
+    </div>
+  </div>
+
+  <!-- Card 3: Libros Prestados -->
+  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
+    <div>
+      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Prestados</span>
+      <strong class="d-block fs-2 mt-1 text-warning" style="font-weight: 800; color: #f08c00 !important;">{{ libros_prestados }}</strong>
+    </div>
+    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #f08c00;">
+      <i class="bi bi-arrow-left-right fs-4"></i>
+    </div>
+  </div>
+
+  <!-- Card 4: Reservas Activas -->
+  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #e3fafc 0%, #c5f6fa 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
+    <div>
+      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Reservas activas</span>
+      <strong class="d-block fs-2 mt-1 text-info" style="font-weight: 800; color: #0c8599 !important;">{{ reservas_activas }}</strong>
+    </div>
+    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #0c8599;">
+      <i class="bi bi-bookmark-check fs-4"></i>
+    </div>
+  </div>
+
+  <!-- Card 5: Sancionados -->
+  <div class="stat-card d-flex align-items-center justify-content-between p-3 border-0 shadow-sm transition-hover" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%); border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;">
+    <div>
+      <span class="text-secondary-emphasis fw-semibold small text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Sancionados</span>
+      <strong class="d-block fs-2 mt-1 text-danger" style="font-weight: 800; color: #fa5252 !important;">{{ usuarios_sancionados }}</strong>
+    </div>
+    <div class="text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #fa5252;">
+      <i class="bi bi-exclamation-triangle fs-4"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Chart: Prestamos por mes -->
+  <div class="col-xl-8 col-lg-7">
+    <div class="panel border-0 shadow-sm p-4 h-100">
+      <div class="panel-header border-0 pb-0 mb-3">
+        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Tendencia de Préstamos por Mes</h2>
+      </div>
+      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+        <canvas id="prestamosMesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart: Categorias -->
+  <div class="col-xl-4 col-lg-5">
+    <div class="panel border-0 shadow-sm p-4 h-100">
+      <div class="panel-header border-0 pb-0 mb-3">
+        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Distribución por Categorías</h2>
+      </div>
+      <div class="chart-container d-flex align-items-center justify-content-center" style="position: relative; height: 260px; width: 100%;">
+        <canvas id="categoriasChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Chart: Libros mas reservados -->
+  <div class="col-lg-6">
+    <div class="panel border-0 shadow-sm p-4 h-100">
+      <div class="panel-header border-0 pb-0 mb-3">
+        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Libros más Reservados</h2>
+      </div>
+      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+        <canvas id="reservasChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart: Autor mas leido -->
+  <div class="col-lg-6">
+    <div class="panel border-0 shadow-sm p-4 h-100">
+      <div class="panel-header border-0 pb-0 mb-3">
+        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Autores más Leídos (Préstamos)</h2>
+      </div>
+      <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+        <canvas id="autoresChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Activity -->
+  <div class="col-12">
+    <div class="panel border-0 shadow-sm p-4">
+      <div class="panel-header border-0 pb-0 mb-3">
+        <h2 class="fs-5 fw-bold text-indigo-950 mb-0">Actividad Reciente en el Sistema</h2>
+      </div>
+      <div class="activity-list">
+        {% for item in actividad %}
+        <div class="activity-item py-3 px-2 d-flex align-items-center justify-content-between border-bottom border-light">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center 
+              {% if item.fecha_reserva %}bg-info-subtle text-info{% else %}bg-primary-subtle text-primary{% endif %}" style="width: 40px; height: 40px;">
+              {% if item.fecha_reserva %}
+              <i class="bi bi-bookmark-fill fs-5"></i>
+              {% else %}
+              <i class="bi bi-arrow-left-right fs-5"></i>
+              {% endif %}
+            </div>
+            <div>
+              <strong class="d-block text-indigo-950">{{ item.libro }}</strong>
+              <span class="text-secondary small">{{ item.usuario }} · 
+                <span class="badge {% if item.estado == 'activa' or item.estado == 'activo' %}status-activo{% elif item.estado == 'devuelto' %}status-devuelto{% elif item.estado == 'retrasado' %}status-retrasado{% else %}status-prestado{% endif %}">
+                  {{ item.get_estado_display }}
+                </span>
+              </span>
+            </div>
+          </div>
+          <small class="text-muted fw-medium">
+            {% if item.fecha_reserva %}
+              <i class="bi bi-clock me-1"></i>{{ item.fecha_reserva|date:"d/m/Y H:i" }}
+            {% else %}
+              <i class="bi bi-clock me-1"></i>{{ item.creado|date:"d/m/Y H:i" }}
+            {% endif %}
+          </small>
+        </div>
+        {% empty %}
+        <p class="text-muted mb-0 py-3 text-center">Sin actividad registrada en las últimas horas.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.chartEndpoints = {
+    prestamos: "{% url 'dashboard:chart_prestamos_mes' %}",
+    reservas: "{% url 'dashboard:chart_libros_reservados' %}",
+    categorias: "{% url 'dashboard:chart_categorias' %}",
+    autores: "{% url 'dashboard:chart_autores_leidos' %}"
+  };
+  initDashboardCharts();
+</script>
+{% endblock %}

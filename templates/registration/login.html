@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Ingresar{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <h1>Biblioteca Digital</h1>
+      <p>Gestion academica de libros, prestamos y reservas.</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Usuario</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Contrasena</label>
+        {{ form.password }}
+      </div>
+      <button class="btn btn-primary w-100" type="submit">Ingresar</button>
+    </form>
+    <div class="auth-links">
+      <a href="{% url 'usuarios:registro' %}">Crear cuenta</a>
+      <a href="{% url 'password_reset' %}">Recuperar contrasena</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

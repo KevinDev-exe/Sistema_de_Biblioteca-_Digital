@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ libro.titulo }}{% endblock %}
+{% block content %}
+<div class="detail-layout">
+  <div class="detail-cover">
+    {% if libro.portada %}<img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}">{% else %}<i class="bi bi-book"></i>{% endif %}
+  </div>
+  <div class="detail-info">
+    <span class="badge status-{{ libro.estado }}">{{ libro.get_estado_display }}</span>
+    <h1>{{ libro.titulo }}</h1>
+    <p class="lead">{{ libro.descripcion|default:"Sin descripcion registrada." }}</p>
+    <dl class="row">
+      <dt class="col-sm-3">Autor</dt><dd class="col-sm-9">{{ libro.autor.nombre }}</dd>
+      <dt class="col-sm-3">Categoria</dt><dd class="col-sm-9">{{ libro.categoria.nombre }}</dd>
+      <dt class="col-sm-3">ISBN</dt><dd class="col-sm-9">{{ libro.isbn }}</dd>
+      <dt class="col-sm-3">Publicacion</dt><dd class="col-sm-9">{{ libro.fecha_publicacion|default:"No registrada" }}</dd>
+      <dt class="col-sm-3">Stock</dt><dd class="col-sm-9">{{ libro.cantidad_disponible }} de {{ libro.cantidad }}</dd>
+    </dl>
+    <div class="d-flex gap-2">
+      {% if libro.cantidad_disponible > 0 %}<a class="btn btn-primary" href="{% url 'reservas:reservar_libro' libro.pk %}"><i class="bi bi-bookmark-plus"></i> Reservar</a>{% endif %}
+      <a class="btn btn-outline-secondary" href="{% url 'libros:catalogo' %}">Volver</a>
+      {% if user.es_bibliotecario %}<a class="btn btn-outline-primary" href="{% url 'libros:libro_update' libro.pk %}"><i class="bi bi-pencil"></i></a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

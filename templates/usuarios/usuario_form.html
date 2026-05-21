@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Usuario{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Editar usuario</h1><p>Actualiza rol y estado del usuario.</p></div></div>
+<div class="panel compact">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{% url 'usuarios:list' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Prestamos{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Prestamos</h1><p>Seguimiento de prestamos activos, entregas y multas.</p></div><a class="btn btn-primary" href="{% url 'prestamos:create' %}"><i class="bi bi-plus-lg"></i> Prestamo</a></div>
+<form class="filter-bar mb-3">
+  <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Usuario, correo o libro">
+  <select class="form-select" name="estado"><option value="">Estado</option>{% for value,label in estados %}<option value="{{ value }}" {% if request.GET.estado == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+  <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+</form>
+<div class="panel table-panel">
+  <table class="table align-middle">
+    <thead><tr><th>Usuario</th><th>Libro</th><th>Prestamo</th><th>Devolucion</th><th>Estado</th><th>Multa</th><th></th></tr></thead>
+    <tbody>
+      {% for prestamo in prestamos %}
+      <tr>
+        <td>{{ prestamo.usuario }}</td>
+        <td><strong>{{ prestamo.libro.titulo }}</strong></td>
+        <td>{{ prestamo.fecha_prestamo }}</td>
+        <td>{{ prestamo.fecha_devolucion }}</td>
+        <td><span class="badge status-{{ prestamo.estado }}">{{ prestamo.get_estado_display }}</span></td>
+        <td>${{ prestamo.multa }}</td>
+        <td class="text-end">
+          {% if prestamo.estado != "devuelto" %}<a class="btn btn-sm btn-outline-success" href="{% url 'prestamos:devolver' prestamo.pk %}"><i class="bi bi-check2-circle"></i></a>{% endif %}
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'prestamos:update' prestamo.pk %}"><i class="bi bi-pencil"></i></a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'prestamos:delete' prestamo.pk %}"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="7" class="text-center text-muted">Sin prestamos.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "pagination.html" %}
+{% endblock %}
+

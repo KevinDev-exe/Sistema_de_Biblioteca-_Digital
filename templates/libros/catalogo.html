@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Catalogo{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Catalogo</h1>
+    <p>Explora libros disponibles, prestados y reservados.</p>
+  </div>
+  {% if user.es_bibliotecario %}<a class="btn btn-primary" href="{% url 'libros:libro_create' %}"><i class="bi bi-plus-lg"></i> Libro</a>{% endif %}
+</div>
+<form class="filter-bar mb-4">
+  <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Titulo, ISBN, autor o categoria">
+  <select class="form-select" name="autor">
+    <option value="">Autor</option>
+    {% for autor in autores %}<option value="{{ autor.id }}" {% if request.GET.autor == autor.id|stringformat:"s" %}selected{% endif %}>{{ autor.nombre }}</option>{% endfor %}
+  </select>
+  <select class="form-select" name="categoria">
+    <option value="">Categoria</option>
+    {% for categoria in categorias %}<option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>{{ categoria.nombre }}</option>{% endfor %}
+  </select>
+  <select class="form-select" name="estado">
+    <option value="">Estado</option>
+    {% for value,label in estados %}<option value="{{ value }}" {% if request.GET.estado == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+</form>
+
+<div class="book-grid">
+  {% for libro in libros %}
+  <article class="book-card">
+    <div class="book-cover">
+      {% if libro.portada %}<img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}">{% else %}<i class="bi bi-book"></i>{% endif %}
+    </div>
+    <div class="book-body">
+      <span class="badge status-{{ libro.estado }}">{{ libro.get_estado_display }}</span>
+      <h2>{{ libro.titulo }}</h2>
+      <p>{{ libro.autor.nombre }} · {{ libro.categoria.nombre }}</p>
+      <div class="book-meta"><span>ISBN {{ libro.isbn }}</span><span>{{ libro.cantidad_disponible }} disponibles</span></div>
+      <div class="d-flex gap-2 mt-3">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'libros:libro_detail' libro.pk %}">Ver</a>
+        {% if libro.cantidad_disponible > 0 %}<a class="btn btn-sm btn-primary" href="{% url 'reservas:reservar_libro' libro.pk %}">Reservar</a>{% endif %}
+      </div>
+    </div>
+  </article>
+  {% empty %}
+  <div class="empty-state">No se encontraron libros.</div>
+  {% endfor %}
+</div>
+{% include "pagination.html" %}
+{% endblock %}
+

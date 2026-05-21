@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Mis prestamos{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Mis prestamos</h1><p>Historial personal de prestamos.</p></div></div>
+<div class="panel table-panel">
+  <table class="table align-middle">
+    <thead><tr><th>Libro</th><th>Prestamo</th><th>Devolucion</th><th>Entrega</th><th>Estado</th><th>Multa</th></tr></thead>
+    <tbody>{% for prestamo in prestamos %}<tr><td><strong>{{ prestamo.libro.titulo }}</strong><br><span class="text-muted">{{ prestamo.libro.autor.nombre }}</span></td><td>{{ prestamo.fecha_prestamo }}</td><td>{{ prestamo.fecha_devolucion }}</td><td>{{ prestamo.fecha_entrega|default:"-" }}</td><td><span class="badge status-{{ prestamo.estado }}">{{ prestamo.get_estado_display }}</span></td><td>${{ prestamo.multa }}</td></tr>{% empty %}<tr><td colspan="6" class="text-center text-muted">Aun no tienes prestamos.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% include "pagination.html" %}
+{% endblock %}
+
