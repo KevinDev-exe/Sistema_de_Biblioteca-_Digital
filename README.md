@@ -67,3 +67,18 @@ El servidor se ejecutará en `http://127.0.0.1:8000/`
 
 ## Estructura del proyecto
 
+El proyecto está dividido en aplicaciones modulares para facilitar el mantenimiento y la escalabilidad:
+
+```text
+Sistema_de_Biblioteca_Digital/
+├── accounts/          # Gestión de usuarios, roles, autenticación y perfiles
+├── dashboard/         # Panel principal con métricas, gráficos y actividad reciente
+├── libros/            # Gestión del catálogo: libros, autores y categorías
+├── notificaciones/    # Lógica de envío de correos y alertas del sistema
+├── prestamos/         # Registro de préstamos, devoluciones, estados y sanciones
+├── reportes/          # Módulo para generar y exportar datos a PDF, Excel y CSV
+├── reservas/          # Solicitudes de libros y listas de espera
+├── static/            # Archivos estáticos del diseño premium (CSS, JS, iconos)
+├── templates/         # Plantillas HTML globales y layouts principales (base.html)
+└── Sistema_de_Biblioteca_Digital/ # Configuración principal de Django (settings, urls)
+```
