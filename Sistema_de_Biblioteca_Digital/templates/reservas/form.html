@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Reserva{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Reserva</h1><p>Gestiona una reserva de libro.</p></div></div>
+<div class="panel compact">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% for error in field.errors %}<div class="invalid-text">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ request.META.HTTP_REFERER|default:'/' }}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
+

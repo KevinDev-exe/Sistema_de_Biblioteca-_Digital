@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Confirmar eliminacion{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Confirmar eliminacion</h1>
+    <p>Esta accion no se puede deshacer.</p>
+  </div>
+</div>
+<div class="panel compact">
+  <p class="mb-4">Vas a eliminar <strong>{{ object }}</strong>.</p>
+  <form method="post" class="d-flex gap-2">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit"><i class="bi bi-trash"></i> Eliminar</button>
+    <a class="btn btn-outline-secondary" href="{{ request.META.HTTP_REFERER|default:'/' }}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
+

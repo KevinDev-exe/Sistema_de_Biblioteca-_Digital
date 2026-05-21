@@ -16,6 +16,7 @@ def dashboard(request):
 
     # DASHBOARD BIBLIOTECARIO
     if request.user.perfil.rol == 'ADMIN':
+        return redirect('dashboard:home')
 
         total_libros = Libro.objects.count()
 
