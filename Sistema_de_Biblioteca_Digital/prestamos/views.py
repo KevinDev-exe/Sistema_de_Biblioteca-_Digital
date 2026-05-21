@@ -3,14 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse
-from django.core.mail import send_mail
-from django.conf import settings
 from datetime import timedelta
 import csv
 
 from .models import Prestamo
 from .forms import PrestamoForm, DevolucionForm, PrestamoEditForm
 from libros.models import Libro
+from notificaciones.services import ServicioNotificaciones
 
 
 @login_required
@@ -126,16 +125,16 @@ def cancelar_prestamo(request, prestamo_id):
             prestamo.save()
 
             if request.user.perfil.rol == 'ADMIN':
-                try:
-                    send_mail(
-                        'Tu solicitud de préstamo ha sido cancelada',
-                        f'Hola {prestamo.usuario.username},\n\nTu solicitud de préstamo para el libro "{prestamo.libro.titulo}" ha sido cancelada por el bibliotecario.\n\nSaludos.',
-                        settings.DEFAULT_FROM_EMAIL,
-                        [prestamo.usuario.email],
-                        fail_silently=True,
+                ServicioNotificaciones.crear_notificacion(
+                    prestamo=prestamo,
+                    tipo='CANCELACION',
+                    asunto='Tu solicitud de préstamo ha sido cancelada',
+                    mensaje=(
+                        f'Hola {prestamo.usuario.first_name or prestamo.usuario.username},\n\n'
+                        f'Tu solicitud de préstamo para el libro "{prestamo.libro.titulo}" '
+                        f'ha sido cancelada por el bibliotecario.\n\nSaludos,\nBiblioteca Digital'
                     )
-                except Exception:
-                    pass
+                )
 
             messages.success(
                 request,
@@ -143,7 +142,7 @@ def cancelar_prestamo(request, prestamo_id):
             )
 
     else:
-        
+
         messages.error(
             request,
             'No tienes permiso para cancelar esta solicitud.'
@@ -171,10 +170,13 @@ def aprobar_prestamo(request, prestamo_id):
             prestamo.fecha_devolucion = fecha_devolucion
             prestamo.estado = 'ACTIVO'
             prestamo.save()
+
+            ServicioNotificaciones.notificar_aprobacion_prestamo(prestamo)
+
             messages.success(request, 'Solicitud aprobada y fecha asignada correctamente.')
         else:
             messages.error(request, 'Solo se pueden aprobar préstamos pendientes.')
-    
+
     return redirect('lista_prestamos')
 
 
@@ -240,6 +242,8 @@ def devolver_prestamo(request, prestamo_id):
         )
 
     prestamo.marcar_devuelto()
+
+    ServicioNotificaciones.notificar_devolucion(prestamo)
 
     messages.success(
         request,

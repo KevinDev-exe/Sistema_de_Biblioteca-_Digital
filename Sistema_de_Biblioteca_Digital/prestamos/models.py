@@ -40,6 +40,15 @@ class Prestamo(models.Model):
         null=True
     )
 
+    notificacion_vencimiento_enviada = models.BooleanField(
+        default=False
+    )
+
+    fecha_notificacion_enviada = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
     estado = models.CharField(
         max_length=20,
         choices=ESTADOS,
@@ -83,6 +92,21 @@ class Prestamo(models.Model):
             return 0
 
         return (referencia - self.fecha_devolucion).days
+
+    @property
+    def dias_para_vencimiento(self):
+
+        if self.estado not in ['ACTIVO', 'RETRASADO']:
+            return None
+
+        dias = (self.fecha_devolucion - timezone.localdate()).days
+        return dias
+
+    @property
+    def proxima_a_vencer(self):
+
+        dias = self.dias_para_vencimiento
+        return dias is not None and 0 <= dias <= 2
 
 
     def calcular_multa(self):
@@ -134,7 +158,6 @@ class Prestamo(models.Model):
             self.libro.cantidad - activos
         )
 
-
         self.libro.estado = (
             'PRESTADO'
             if self.libro.disponibles == 0
@@ -142,3 +165,19 @@ class Prestamo(models.Model):
         )
 
         self.libro.save()
+
+    def enviar_notificacion_vencimiento(self):
+        """Enviar notificación de vencimiento si aún no se ha enviado."""
+        if not self.proxima_a_vencer or self.notificacion_vencimiento_enviada:
+            return False
+
+        from notificaciones.services import ServicioNotificaciones
+
+        enviado = ServicioNotificaciones.notificar_vencimiento_proximo(self)
+
+        if enviado:
+            self.notificacion_vencimiento_enviada = True
+            self.fecha_notificacion_enviada = timezone.now()
+            super().save(update_fields=['notificacion_vencimiento_enviada', 'fecha_notificacion_enviada'])
+
+        return enviado
