@@ -2,14 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models.deletion import ProtectedError
+from django.core.paginator import Paginator
 
 from .forms import LibroForm, AutorForm, CategoriaForm
 from .models import Libro, Autor, Categoria
 from prestamos.models import Prestamo
 
-
 def es_admin(usuario):
-
     return usuario.perfil.rol == 'ADMIN'
 
 @login_required
@@ -169,13 +168,22 @@ def eliminar_libro(request, libro_id):
 @login_required
 def lista_autores(request):
 
-    autores = Autor.objects.all()
+    autores = Autor.objects.all().order_by('nombre')
+    
+    query = request.GET.get('q')
+    if query:
+        autores = autores.filter(nombre__icontains=query)
+
+    paginator = Paginator(autores, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         'libros/autores.html',
         {
-            'autores': autores
+            'autores': page_obj,
+            'query': query if query else ''
         }
     )
 
