@@ -14,15 +14,12 @@ def es_admin(usuario):
 @login_required
 def lista_libros(request):
 
-    libros = Libro.objects.all()
+    libros = Libro.objects.all().order_by('-id')
 
-    buscar = request.GET.get('buscar')
+    buscar = request.GET.get('q')
 
     if buscar:
-
-        libros = libros.filter(
-            titulo__icontains=buscar
-        )
+        libros = libros.filter(titulo__icontains=buscar)
 
     prestamos_usuario = Prestamo.objects.filter(
         usuario=request.user,
@@ -34,18 +31,19 @@ def lista_libros(request):
     )
 
     libros_solicitados = []
-
     for prestamo in prestamos_usuario:
+        libros_solicitados.append(prestamo.libro.id)
 
-        libros_solicitados.append(
-            prestamo.libro.id
-        )
+    paginator = Paginator(libros, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         'libros/lista_libros.html',
         {
-            'libros': libros,
+            'libros': page_obj,
+            'query': buscar if buscar else '',
             'libros_solicitados': libros_solicitados
         }
     )

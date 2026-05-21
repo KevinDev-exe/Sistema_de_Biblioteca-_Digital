@@ -3,175 +3,148 @@
 {% block content %}
 
 <div class="page-header align-items-end mb-4">
-
     <div>
-
-        <h1 class="fw-extrabold text-dark mb-1">Libros</h1>
-
-        <p class="text-muted">
-            Biblioteca digital
-        </p>
-
+        <h1 class="fw-extrabold text-dark mb-1">
+            <i class="bi bi-book text-primary"></i> Libros
+        </h1>
+        <p class="text-muted mb-0">Catálogo de la biblioteca digital.</p>
     </div>
-
     {% if request.user.perfil.rol == 'ADMIN' %}
-
-    <a href="{% url 'crear_libro' %}" class="btn btn-primary">
-
-        Nuevo libro
-
-    </a>
-
+    <div>
+        <a href="{% url 'crear_libro' %}" class="btn btn-primary shadow-sm fw-bold rounded-pill px-4">
+            <i class="bi bi-plus-circle me-1"></i> Nuevo libro
+        </a>
+    </div>
     {% endif %}
-
 </div>
 
+<!-- Buscador -->
+<div class="panel border-0 shadow-sm p-4 mb-4 bg-white rounded-4">
+    <form method="GET" class="row g-3 m-0">
+        <div class="col-md-8 col-lg-6 px-0">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                <span class="input-group-text bg-white border-end-0 text-muted ps-4"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control bg-white border-start-0 ps-0 shadow-none border-end-0" placeholder="Buscar libro por título...">
+                <button type="submit" class="btn btn-primary px-4 fw-bold">Buscar</button>
+                <a href="{% url 'lista_libros' %}" class="btn btn-light border-start" title="Limpiar filtros / Refrescar">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
 
-<form method="GET" class="mb-4">
-
-    <div class="input-group">
-
-        <input type="text" name="buscar" class="form-control bg-light" placeholder="Buscar libro..."
-            value="{{request.GET.buscar}}">
-
-        <button class="btn btn-primary">
-
-            Buscar
-
-        </button>
-
-    </div>
-
-</form>
-
-
-<div class="panel border-0 shadow-sm table-panel mt-4">
-
-    <div class="panel-body">
-
-        <table class="table align-middle">
-
-            <thead>
-
+<!-- Tabla de Libros -->
+<div class="panel border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-
-                    <th>Imagen</th>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Categoría</th>
-                    <th>Disponibles</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-
+                    <th class="ps-4 text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Imagen</th>
+                    <th class="text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Título</th>
+                    <th class="text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Autor</th>
+                    <th class="text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Categoría</th>
+                    <th class="text-center text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Disponibles</th>
+                    <th class="text-center text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Estado</th>
+                    <th class="text-end pe-4 text-uppercase small fw-bold text-secondary" style="letter-spacing: 0.5px;">Acciones</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
                 {% for libro in libros %}
-
                 <tr>
-
-                    <td>
-
+                    <td class="ps-4">
                         {% if libro.imagen %}
-
-                        <img src="{{ libro.imagen.url }}" width="70" class="rounded">
-
+                        <img src="{{ libro.imagen.url }}" class="rounded shadow-sm border" style="width: 45px; height: 65px; object-fit: cover;">
                         {% else %}
-
-                        Sin imagen
-
+                        <div class="bg-light rounded shadow-sm border d-flex align-items-center justify-content-center text-muted" style="width: 45px; height: 65px;">
+                            <i class="bi bi-book fs-4 opacity-50"></i>
+                        </div>
                         {% endif %}
-
                     </td>
-
-                    <td>{{libro.titulo}}</td>
-
-                    <td>{{libro.autor}}</td>
-
-                    <td>{{libro.categoria}}</td>
-
-                    <td>
-
-                        {{libro.disponibles}} / {{libro.cantidad}}
-
+                    <td class="fw-bold text-dark">{{ libro.titulo }}</td>
+                    <td class="text-secondary">{{ libro.autor }}</td>
+                    <td><span class="badge bg-light text-dark border px-2 py-1">{{ libro.categoria }}</span></td>
+                    <td class="text-center">
+                        <span class="fw-bold fs-6 {% if libro.disponibles == 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ libro.disponibles }}
+                        </span> 
+                        <span class="text-muted small">/ {{ libro.cantidad }}</span>
                     </td>
-
-                    <td>
-
-                        {{libro.estado}}
-
+                    <td class="text-center">
+                        <span class="badge rounded-pill {% if libro.estado == 'DISPONIBLE' %}bg-success{% else %}bg-danger{% endif %} px-3 py-2 fw-medium border border-light border-opacity-25 shadow-sm">
+                            {{ libro.estado }}
+                        </span>
                     </td>
-
-                    <td>
-
+                    <td class="text-end pe-4">
                         {% if request.user.perfil.rol == 'ADMIN' %}
-
-                        <a href="{% url 'editar_libro' libro.id %}" class="btn btn-warning btn-sm">
-
-                            Editar
-
-                        </a>
-
-                        <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este libro?')">
-
-                            Eliminar
-
-                        </a>
-
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'editar_libro' libro.id %}" class="btn btn-sm btn-light border text-warning shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-hover" style="width: 32px; height: 32px;" title="Editar">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-sm btn-light border text-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-hover" style="width: 32px; height: 32px;" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este libro?')">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
                         {% endif %}
-
 
                         {% if request.user.perfil.rol == 'LECTOR' %}
-
+                            <div class="d-flex justify-content-end">
                             {% if libro.id in libros_solicitados %}
-
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                Solicitud enviada
-                            </button>
-
+                                <button class="btn btn-secondary btn-sm rounded-pill px-3 shadow-sm" disabled>
+                                    <i class="bi bi-clock me-1"></i> Solicitado
+                                </button>
                             {% elif libro.disponibles > 0 %}
-
-                            <a href="{% url 'reservar_libro' libro.id %}" class="btn btn-success btn-sm">
-                                Pedir prestado
-                            </a>
-
+                                <a href="{% url 'reservar_libro' libro.id %}" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm transition-hover">
+                                    <i class="bi bi-bookmark-plus me-1"></i> Pedir
+                                </a>
                             {% else %}
-
-                            <button class="btn btn-danger btn-sm" disabled>
-                                Sin disponibilidad
-                            </button>
-
+                                <button class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" disabled>
+                                    <i class="bi bi-x-circle me-1"></i> Sin stock
+                                </button>
                             {% endif %}
-
+                            </div>
                         {% endif %}
-
                     </td>
-
                 </tr>
-
                 {% empty %}
-
                 <tr>
-
-                    <td colspan="7">
-
-                        No hay libros registrados
-
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <div class="mb-3"><i class="bi bi-journal-x fs-1 opacity-50"></i></div>
+                        <h6>No se encontraron libros</h6>
+                        {% if query %}<p class="small mb-0">Intenta con otros términos de búsqueda.</p>{% endif %}
                     </td>
-
                 </tr>
-
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
 
+    <!-- Paginación -->
+    {% if libros.has_other_pages %}
+    <div class="card-footer bg-light border-top p-3 d-flex justify-content-center">
+        <ul class="pagination pagination-sm mb-0 shadow-sm">
+            {% if libros.has_previous %}
+            <li class="page-item"><a class="page-link text-primary" href="?page={{ libros.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo; Anterior</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link text-muted">&laquo; Anterior</span></li>
+            {% endif %}
+
+            {% for i in libros.paginator.page_range %}
+                {% if libros.number == i %}
+                <li class="page-item active"><span class="page-link border-primary bg-primary">{{ i }}</span></li>
+                {% else %}
+                <li class="page-item"><a class="page-link text-primary" href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if libros.has_next %}
+            <li class="page-item"><a class="page-link text-primary" href="?page={{ libros.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Siguiente &raquo;</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link text-muted">Siguiente &raquo;</span></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}
