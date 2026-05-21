@@ -1,10 +1,21 @@
-# Python cache
+# Python
 __pycache__/
 *.pyc
+*.pyo
 
-# Base de datos
+# Django
 db.sqlite3
+media/
+staticfiles/
 
 # Entornos
 venv/
+env/
 .env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
