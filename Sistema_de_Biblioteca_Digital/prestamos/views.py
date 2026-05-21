@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse
-from datetime import timedelta
+from datetime import timedelta, datetime
 import csv
 from django.db.models import Q
 
@@ -176,26 +176,59 @@ def aprobar_prestamo(request, prestamo_id):
     if request.user.perfil.rol != 'ADMIN':
         return redirect('lista_prestamos')
 
-    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+    prestamo = get_object_or_404(
+        Prestamo,
+        id=prestamo_id
+    )
 
     if request.method == 'POST':
-        fecha_devolucion = request.POST.get('fecha_devolucion')
+
+        fecha_devolucion = request.POST.get(
+            'fecha_devolucion'
+        )
+
         if not fecha_devolucion:
-            messages.error(request, 'Debe indicar una fecha de devolución.')
-            return redirect('lista_prestamos')
+
+            messages.error(
+                request,
+                'Debe indicar una fecha de devolución.'
+            )
+
+            return redirect(
+                'lista_prestamos'
+            )
 
         if prestamo.estado == 'PENDIENTE':
-            prestamo.fecha_devolucion = fecha_devolucion
+
+            # Convertir string a fecha
+            prestamo.fecha_devolucion = datetime.strptime(
+                fecha_devolucion,
+                "%Y-%m-%d"
+            ).date()
+
             prestamo.estado = 'ACTIVO'
+
             prestamo.save()
 
-            ServicioNotificaciones.notificar_aprobacion_prestamo(prestamo)
+            ServicioNotificaciones.notificar_aprobacion_prestamo(
+                prestamo
+            )
 
-            messages.success(request, 'Solicitud aprobada y fecha asignada correctamente.')
+            messages.success(
+                request,
+                'Solicitud aprobada y fecha asignada correctamente.'
+            )
+
         else:
-            messages.error(request, 'Solo se pueden aprobar préstamos pendientes.')
 
-    return redirect('lista_prestamos')
+            messages.error(
+                request,
+                'Solo se pueden aprobar préstamos pendientes.'
+            )
+
+    return redirect(
+        'lista_prestamos'
+    )
 
 
 @login_required
