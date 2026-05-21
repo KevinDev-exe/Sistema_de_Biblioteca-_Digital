@@ -25,6 +25,11 @@ class LibroForm(forms.ModelForm):
             self.fields['cantidad'].initial = None
             self.fields['disponibles'].initial = None
 
+        self.fields['disponibles'].widget.attrs.update({
+            'readonly': True,
+            'style': 'background-color: #e9ecef; cursor: not-allowed; pointer-events: none;'
+        })
+
 class AutorForm(forms.ModelForm):
 
     class Meta:
