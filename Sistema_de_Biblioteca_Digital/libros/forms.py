@@ -21,6 +21,9 @@ class LibroForm(forms.ModelForm):
                 'class': 'form-control'
             })
 
+        if not self.instance.pk:
+            self.fields['cantidad'].initial = None
+            self.fields['disponibles'].initial = None
 
 class AutorForm(forms.ModelForm):
 
