@@ -47,23 +47,23 @@ El servidor se ejecutará en `http://127.0.0.1:8000/`
 
 | Campo    | Valor            |
 |----------|------------------|
-| Usuario  | `________________` |
-| Clave    | `________________` |
+| Usuario  | `django` |
+| Clave    | `12345Abc*` |
 
 
 ### Administrador - Biblioteca
 
 | Campo    | Valor            |
 |----------|------------------|
-| Usuario  | `________________` |
-| Clave    | `________________` |
+| Usuario  | `django` |
+| Clave    | `12345Abc*` |
 
 ### Lector - Biblioteca
 
 | Campo    | Valor            |
 |----------|------------------|
-| Usuario  | `________________` |
-| Clave    | `________________` |
+| Usuario  | `Angie` |
+| Clave    | `Prueba123*` |
 
 ## Estructura del proyecto
 
