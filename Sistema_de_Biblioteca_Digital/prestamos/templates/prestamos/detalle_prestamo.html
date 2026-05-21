@@ -1,49 +1,101 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between">
-                <h4 class="mb-0">Detalle del Préstamo</h4>
-                <span class="badge
+<div class="row justify-content-center mt-3">
+    <div class="col-md-7">
+        <div class="panel border-0 shadow-sm rounded-4 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-primary bg-gradient p-4 text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px;">
+                        <i class="bi bi-journal-bookmark fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">Detalle del Préstamo</h4>
+                        <p class="mb-0 small text-white-50">Resumen de la transacción</p>
+                    </div>
+                </div>
+                <span class="badge rounded-pill
                     {% if prestamo.estado == 'ACTIVO' %}bg-success
                     {% elif prestamo.estado == 'RETRASADO' %}bg-danger
                     {% elif prestamo.estado == 'DEVUELTO' %}bg-secondary
-                    {% else %}bg-warning{% endif %} fs-6">
+                    {% else %}bg-warning{% endif %} px-3 py-2 fs-6 fw-semibold shadow-sm border border-light border-opacity-25">
                     {{ prestamo.get_estado_display }}
                 </span>
             </div>
-            <div class="panel-body">
-                <dl class="row">
-                    <dt class="col-sm-5">Libro</dt>
-                    <dd class="col-sm-7">{{ prestamo.libro.titulo }}</dd>
-                    <dt class="col-sm-5">Usuario</dt>
-                    <dd class="col-sm-7">{{ prestamo.usuario.username }}</dd>
-                    <dt class="col-sm-5">Fecha préstamo</dt>
-                    <dd class="col-sm-7">{{ prestamo.fecha_prestamo }}</dd>
-                    <dt class="col-sm-5">Fecha devolución</dt>
-                    <dd class="col-sm-7">{{ prestamo.fecha_devolucion }}</dd>
-                    <dt class="col-sm-5">Fecha entrega</dt>
-                    <dd class="col-sm-7">{{ prestamo.fecha_entrega|default:"Pendiente" }}</dd>
-                    <dt class="col-sm-5">Días de retraso</dt>
-                    <dd class="col-sm-7">{{ prestamo.dias_retraso }}</dd>
-                    <dt class="col-sm-5">Multa</dt>
-                    <dd class="col-sm-7">
-                        {% if prestamo.multa > 0 %}${{ prestamo.multa|floatformat:0 }} COP
-                        {% else %}Sin multa{% endif %}
-                    </dd>
+
+            <!-- Body -->
+            <div class="card-body p-4 p-md-5 bg-white">
+                <div class="row g-4">
+                    <!-- Column 1 -->
+                    <div class="col-sm-6">
+                        <div class="mb-3">
+                            <span class="text-muted small text-uppercase fw-bold" style="letter-spacing: 0.5px;"><i class="bi bi-book me-1"></i> Libro</span>
+                            <div class="fs-5 fw-medium text-dark mt-1">{{ prestamo.libro.titulo }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted small text-uppercase fw-bold" style="letter-spacing: 0.5px;"><i class="bi bi-person me-1"></i> Usuario</span>
+                            <div class="fs-6 text-secondary mt-1">{{ prestamo.usuario.username }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Column 2 -->
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small fw-semibold">Fecha préstamo:</span>
+                                <span class="fw-medium">{{ prestamo.fecha_prestamo|date:"d M Y" }}</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small fw-semibold">Fecha límite:</span>
+                                <span class="fw-medium {% if prestamo.estado == 'RETRASADO' %}text-danger{% endif %}">{{ prestamo.fecha_devolucion|date:"d M Y" }}</span>
+                            </div>
+                            <div class="mb-0 d-flex justify-content-between">
+                                <span class="text-muted small fw-semibold">Fecha entrega:</span>
+                                <span class="fw-medium">{{ prestamo.fecha_entrega|date:"d M Y"|default:"Pendiente" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retraso y Multa -->
+                    <div class="col-12 mt-4 pt-4 border-top">
+                        <div class="row text-center">
+                            <div class="col-6 border-end">
+                                <span class="text-muted small text-uppercase fw-bold" style="letter-spacing: 0.5px;">Días de retraso</span>
+                                <div class="fs-3 fw-bold {% if prestamo.dias_retraso > 0 %}text-danger{% else %}text-success{% endif %} mt-1">
+                                    {{ prestamo.dias_retraso }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small text-uppercase fw-bold" style="letter-spacing: 0.5px;">Multa actual</span>
+                                <div class="fs-3 fw-bold {% if prestamo.multa > 0 %}text-danger{% else %}text-success{% endif %} mt-1">
+                                    {% if prestamo.multa > 0 %}${{ prestamo.multa|floatformat:0 }}
+                                    {% else %}<span class="fs-5">Sin multa</span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {% if prestamo.observaciones %}
-                    <dt class="col-sm-5">Observaciones</dt>
-                    <dd class="col-sm-7">{{ prestamo.observaciones }}</dd>
+                    <div class="col-12 mt-4">
+                        <div class="p-3 bg-warning bg-opacity-10 rounded-3 border border-warning border-opacity-25">
+                            <span class="text-warning-emphasis small text-uppercase fw-bold d-block mb-1"><i class="bi bi-info-circle me-1"></i> Observaciones</span>
+                            <div class="text-dark">{{ prestamo.observaciones }}</div>
+                        </div>
+                    </div>
                     {% endif %}
-                </dl>
+                </div>
             </div>
-            <div class="card-footer">
-                <a href="{% url 'lista_prestamos' %}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+
+            <!-- Footer -->
+            <div class="card-footer bg-light border-top p-4 d-flex justify-content-between align-items-center">
+                <a href="{% url 'lista_prestamos' %}" class="btn btn-light border fw-medium text-secondary rounded-pill px-4 transition-hover">
+                    <i class="bi bi-arrow-left me-1"></i> Volver
+                </a>
+                
                 {% if user.perfil.rol == 'ADMIN' and prestamo.estado == 'ACTIVO' %}
-                <a href="{% url 'devolver_prestamo' prestamo.id %}" class="btn btn-primary btn-sm">
-                    Registrar devolución
+                <a href="{% url 'devolver_prestamo' prestamo.id %}" class="btn btn-primary fw-bold rounded-pill shadow-sm px-4 transition-hover">
+                    Registrar devolución <i class="bi bi-check-circle ms-1"></i>
                 </a>
                 {% endif %}
             </div>
