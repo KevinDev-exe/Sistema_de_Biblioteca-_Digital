@@ -138,6 +138,11 @@ class Prestamo(models.Model):
         ):
 
             self.estado = 'RETRASADO'
+            
+            # Sanción automática
+            if hasattr(self.usuario, 'perfil') and not self.usuario.perfil.sancionado:
+                self.usuario.perfil.sancionado = True
+                self.usuario.perfil.save()
 
 
         if self.estado in ['DEVUELTO', 'RETRASADO']:

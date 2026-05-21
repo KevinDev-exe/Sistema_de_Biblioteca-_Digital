@@ -8,11 +8,11 @@
     </h2>
     {% if request.user.perfil.rol == 'ADMIN' %}
     <div class="d-flex gap-2">
-        <a href="{% url 'exportar_prestamos_pdf' %}" class="btn btn-outline-danger">
+        <a href="{% url 'exportar_prestamos_pdf' %}?q={{ query }}&estado={{ estado_filtro }}" class="btn btn-outline-danger">
             <i class="bi bi-file-earmark-pdf"></i>
             Exportar PDF
         </a>
-        <a href="{% url 'exportar_prestamos_csv' %}" class="btn btn-outline-success">
+        <a href="{% url 'exportar_prestamos_csv' %}?q={{ query }}&estado={{ estado_filtro }}" class="btn btn-outline-success">
             <i class="bi bi-file-earmark-spreadsheet"></i>
             Exportar CSV
         </a>
@@ -22,6 +22,34 @@
         </a>
     </div>
     {% endif %}
+</div>
+
+<!-- Buscador y Filtros -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Buscar por libro o usuario..." value="{{ query }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-funnel"></i> Estado</span>
+                    <select name="estado" class="form-select">
+                        <option value="">Todos</option>
+                        {% for valor, etiqueta in ESTADOS %}
+                            <option value="{{ valor }}" {% if estado_filtro == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="table-responsive shadow bg-white rounded p-3">
@@ -79,10 +107,22 @@
                                     <i class="bi bi-arrow-return-left"></i> Devolver
                                 </a>
                             {% endif %}
+                            
+                            {% if p.estado == 'ACTIVO' %}
+                                <a href="{% url 'renovar_prestamo' p.id %}" class="btn btn-sm btn-primary" title="Renovar préstamo">
+                                    <i class="bi bi-arrow-clockwise"></i> Renovar
+                                </a>
+                            {% endif %}
                         {% else %}
                             {% if p.estado == 'PENDIENTE' %}
                                 <a href="{% url 'cancelar_prestamo' p.id %}" class="btn btn-sm btn-danger" title="Cancelar solicitud">
                                     <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                            {% endif %}
+                            
+                            {% if p.estado == 'ACTIVO' %}
+                                <a href="{% url 'renovar_prestamo' p.id %}" class="btn btn-sm btn-primary" title="Renovar préstamo">
+                                    <i class="bi bi-arrow-clockwise"></i> Renovar
                                 </a>
                             {% endif %}
                         {% endif %}

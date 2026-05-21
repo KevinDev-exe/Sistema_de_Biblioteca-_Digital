@@ -40,6 +40,12 @@ urlpatterns = [
     ),
 
     path(
+        '<int:prestamo_id>/renovar/',
+        views.renovar_prestamo,
+        name='renovar_prestamo'
+    ),
+
+    path(
         '<int:prestamo_id>/cancelar/',
         views.cancelar_prestamo,
         name='cancelar_prestamo'

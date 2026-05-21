@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.http import HttpResponse
 from datetime import timedelta
 import csv
+from django.db.models import Q
 
 from .models import Prestamo
 from .forms import PrestamoForm, DevolucionForm, PrestamoEditForm
@@ -14,6 +15,9 @@ from notificaciones.services import ServicioNotificaciones
 
 @login_required
 def lista_prestamos(request):
+
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
 
     if request.user.perfil.rol == 'ADMIN':
 
@@ -31,11 +35,25 @@ def lista_prestamos(request):
             usuario=request.user
         )
 
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
+
     return render(
         request,
         'prestamos/lista_prestamos.html',
         {
-            'prestamos': prestamos
+            'prestamos': prestamos,
+            'query': query,
+            'estado_filtro': estado_filtro,
+            'ESTADOS': Prestamo.ESTADOS
         }
     )
 
@@ -256,6 +274,27 @@ def devolver_prestamo(request, prestamo_id):
 
 
 @login_required
+def renovar_prestamo(request, prestamo_id):
+
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if request.user.perfil.rol != 'ADMIN' and prestamo.usuario != request.user:
+        messages.error(request, 'No tienes permiso para renovar este préstamo.')
+        return redirect('lista_prestamos')
+
+    if prestamo.estado != 'ACTIVO':
+        messages.error(request, 'Solo se pueden renovar préstamos activos.')
+        return redirect('lista_prestamos')
+
+    # Extender por 7 días
+    prestamo.fecha_devolucion = prestamo.fecha_devolucion + timedelta(days=7)
+    prestamo.save()
+    
+    messages.success(request, f'Préstamo renovado exitosamente hasta el {prestamo.fecha_devolucion}.')
+    return redirect('lista_prestamos')
+
+
+@login_required
 def detalle_prestamo(request, prestamo_id):
 
     prestamo = get_object_or_404(
@@ -309,7 +348,20 @@ def exportar_prestamos_csv(request):
     writer = csv.writer(response)
     writer.writerow(['Libro', 'Usuario', 'Fecha Préstamo', 'Fecha Devolución', 'Fecha Entrega', 'Estado', 'Multa'])
 
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
+    
     prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
     
     for p in prestamos:
         writer.writerow([
@@ -342,7 +394,21 @@ def exportar_prestamos_pdf(request):
 
     p.setFont("Helvetica", 10)
     y = 720
+    
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
+    
     prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
     
     p.drawString(50, y, "Libro")
     p.drawString(250, y, "Usuario")
