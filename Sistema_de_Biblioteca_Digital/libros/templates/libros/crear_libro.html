@@ -58,4 +58,17 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cantidadInput = document.getElementById('id_cantidad');
+        const disponiblesInput = document.getElementById('id_disponibles');
+        
+        if (cantidadInput && disponiblesInput) {
+            cantidadInput.addEventListener('input', function() {
+                disponiblesInput.value = this.value;
+            });
+        }
+    });
+</script>
 {% endblock %}
