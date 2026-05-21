@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     'accounts',
     'libros',
     'prestamos',
+    'notificaciones',
+    'dashboard',
+    'reportes',
+    'reservas',
 ]
 
 MIDDLEWARE = [

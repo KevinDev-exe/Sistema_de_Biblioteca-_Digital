@@ -2,15 +2,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from django.http import HttpResponse
+from datetime import timedelta, datetime
+import csv
+from django.db.models import Q
 
 from .models import Prestamo
-from .forms import PrestamoForm, DevolucionForm
+from .forms import PrestamoForm, DevolucionForm, PrestamoEditForm
 from libros.models import Libro
+from notificaciones.services import ServicioNotificaciones
 
 
 @login_required
 def lista_prestamos(request):
+
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
 
     if request.user.perfil.rol == 'ADMIN':
 
@@ -28,11 +35,25 @@ def lista_prestamos(request):
             usuario=request.user
         )
 
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
+
     return render(
         request,
         'prestamos/lista_prestamos.html',
         {
-            'prestamos': prestamos
+            'prestamos': prestamos,
+            'query': query,
+            'estado_filtro': estado_filtro,
+            'ESTADOS': Prestamo.ESTADOS
         }
     )
 
@@ -118,7 +139,20 @@ def cancelar_prestamo(request, prestamo_id):
 
         if prestamo.estado == 'PENDIENTE':
 
-            prestamo.delete()
+            prestamo.estado = 'CANCELADO'
+            prestamo.save()
+
+            if request.user.perfil.rol == 'ADMIN':
+                ServicioNotificaciones.crear_notificacion(
+                    prestamo=prestamo,
+                    tipo='CANCELACION',
+                    asunto='Tu solicitud de préstamo ha sido cancelada',
+                    mensaje=(
+                        f'Hola {prestamo.usuario.first_name or prestamo.usuario.username},\n\n'
+                        f'Tu solicitud de préstamo para el libro "{prestamo.libro.titulo}" '
+                        f'ha sido cancelada por el bibliotecario.\n\nSaludos,\nBiblioteca Digital'
+                    )
+                )
 
             messages.success(
                 request,
@@ -126,7 +160,7 @@ def cancelar_prestamo(request, prestamo_id):
             )
 
     else:
-        
+
         messages.error(
             request,
             'No tienes permiso para cancelar esta solicitud.'
@@ -142,23 +176,59 @@ def aprobar_prestamo(request, prestamo_id):
     if request.user.perfil.rol != 'ADMIN':
         return redirect('lista_prestamos')
 
-    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+    prestamo = get_object_or_404(
+        Prestamo,
+        id=prestamo_id
+    )
 
     if request.method == 'POST':
-        fecha_devolucion = request.POST.get('fecha_devolucion')
+
+        fecha_devolucion = request.POST.get(
+            'fecha_devolucion'
+        )
+
         if not fecha_devolucion:
-            messages.error(request, 'Debe indicar una fecha de devolución.')
-            return redirect('lista_prestamos')
+
+            messages.error(
+                request,
+                'Debe indicar una fecha de devolución.'
+            )
+
+            return redirect(
+                'lista_prestamos'
+            )
 
         if prestamo.estado == 'PENDIENTE':
-            prestamo.fecha_devolucion = fecha_devolucion
+
+            # Convertir string a fecha
+            prestamo.fecha_devolucion = datetime.strptime(
+                fecha_devolucion,
+                "%Y-%m-%d"
+            ).date()
+
             prestamo.estado = 'ACTIVO'
+
             prestamo.save()
-            messages.success(request, 'Solicitud aprobada y fecha asignada correctamente.')
+
+            ServicioNotificaciones.notificar_aprobacion_prestamo(
+                prestamo
+            )
+
+            messages.success(
+                request,
+                'Solicitud aprobada y fecha asignada correctamente.'
+            )
+
         else:
-            messages.error(request, 'Solo se pueden aprobar préstamos pendientes.')
-    
-    return redirect('lista_prestamos')
+
+            messages.error(
+                request,
+                'Solo se pueden aprobar préstamos pendientes.'
+            )
+
+    return redirect(
+        'lista_prestamos'
+    )
 
 
 @login_required
@@ -224,6 +294,8 @@ def devolver_prestamo(request, prestamo_id):
 
     prestamo.marcar_devuelto()
 
+    ServicioNotificaciones.notificar_devolucion(prestamo)
+
     messages.success(
         request,
         'Devolución registrada correctamente.'
@@ -232,6 +304,27 @@ def devolver_prestamo(request, prestamo_id):
     return redirect(
         'lista_prestamos'
     )
+
+
+@login_required
+def renovar_prestamo(request, prestamo_id):
+
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if request.user.perfil.rol != 'ADMIN' and prestamo.usuario != request.user:
+        messages.error(request, 'No tienes permiso para renovar este préstamo.')
+        return redirect('lista_prestamos')
+
+    if prestamo.estado != 'ACTIVO':
+        messages.error(request, 'Solo se pueden renovar préstamos activos.')
+        return redirect('lista_prestamos')
+
+    # Extender por 7 días
+    prestamo.fecha_devolucion = prestamo.fecha_devolucion + timedelta(days=7)
+    prestamo.save()
+    
+    messages.success(request, f'Préstamo renovado exitosamente hasta el {prestamo.fecha_devolucion}.')
+    return redirect('lista_prestamos')
 
 
 @login_required
@@ -249,3 +342,130 @@ def detalle_prestamo(request, prestamo_id):
             'prestamo': prestamo
         }
     )
+
+@login_required
+def editar_prestamo(request, prestamo_id):
+
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+
+    prestamo = get_object_or_404(Prestamo, id=prestamo_id)
+
+    if request.method == 'POST':
+        form = PrestamoEditForm(request.POST, instance=prestamo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Préstamo actualizado correctamente.')
+            return redirect('lista_prestamos')
+    else:
+        form = PrestamoEditForm(instance=prestamo)
+
+    return render(
+        request,
+        'prestamos/form_prestamo.html',
+        {
+            'form': form,
+            'titulo': 'Editar préstamo'
+        }
+    )
+
+@login_required
+def exportar_prestamos_csv(request):
+    
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+        
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="prestamos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Libro', 'Usuario', 'Fecha Préstamo', 'Fecha Devolución', 'Fecha Entrega', 'Estado', 'Multa'])
+
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
+    
+    prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
+    
+    for p in prestamos:
+        writer.writerow([
+            p.libro.titulo,
+            p.usuario.username,
+            p.fecha_prestamo,
+            p.fecha_devolucion,
+            p.fecha_entrega if p.fecha_entrega else 'No entregado',
+            p.get_estado_display(),
+            p.multa
+        ])
+
+    return response
+
+@login_required
+def exportar_prestamos_pdf(request):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+    import io
+
+    if request.user.perfil.rol != 'ADMIN':
+        return redirect('lista_prestamos')
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.setTitle("Reporte de Préstamos")
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "Reporte de Préstamos")
+
+    p.setFont("Helvetica", 10)
+    y = 720
+    
+    query = request.GET.get('q', '')
+    estado_filtro = request.GET.get('estado', '')
+    
+    prestamos = Prestamo.objects.select_related('usuario', 'libro').all()
+    
+    if query:
+        prestamos = prestamos.filter(
+            Q(libro__titulo__icontains=query) |
+            Q(usuario__username__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query)
+        )
+    if estado_filtro:
+        prestamos = prestamos.filter(estado=estado_filtro)
+    
+    p.drawString(50, y, "Libro")
+    p.drawString(250, y, "Usuario")
+    p.drawString(350, y, "Fecha Dev.")
+    p.drawString(450, y, "Estado")
+    p.drawString(520, y, "Multa")
+    y -= 20
+
+    for prestamo in prestamos:
+        p.drawString(50, y, str(prestamo.libro.titulo)[:40])
+        p.drawString(250, y, str(prestamo.usuario.username))
+        p.drawString(350, y, str(prestamo.fecha_devolucion))
+        p.drawString(450, y, prestamo.get_estado_display())
+        p.drawString(520, y, f"${prestamo.multa}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            p.setFont("Helvetica", 10)
+            y = 750
+
+    p.showPage()
+    p.save()
+    
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="prestamos.pdf"'
+    return response

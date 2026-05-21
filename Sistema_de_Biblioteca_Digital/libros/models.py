@@ -86,5 +86,25 @@ class Libro(models.Model):
     def __str__(self):
 
         return self.titulo
+
+    @property
+    def prestamos_activos(self):
+        return self.prestamos.filter(estado__in=["ACTIVO", "RETRASADO"]).count()
+
+    @property
+    def reservas_activas(self):
+        if hasattr(self, 'reservas'):
+            return self.reservas.filter(estado="activa").count()
+        return self.prestamos.filter(estado="PENDIENTE").count()
+
+    @classmethod
+    def mas_reservados(cls, limite=8):
+        from django.db.models import Count, Q
+        return (
+            cls.objects.annotate(
+                total_reservas=Count("prestamos", filter=Q(prestamos__estado="PENDIENTE"))
+            )
+            .order_by("-total_reservas", "titulo")[:limite]
+        )
     
    

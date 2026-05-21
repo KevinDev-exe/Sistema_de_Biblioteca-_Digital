@@ -40,9 +40,33 @@ urlpatterns = [
     ),
 
     path(
+        '<int:prestamo_id>/renovar/',
+        views.renovar_prestamo,
+        name='renovar_prestamo'
+    ),
+
+    path(
         '<int:prestamo_id>/cancelar/',
         views.cancelar_prestamo,
         name='cancelar_prestamo'
+    ),
+
+    path(
+        '<int:prestamo_id>/editar/',
+        views.editar_prestamo,
+        name='editar_prestamo'
+    ),
+
+    path(
+        'exportar/csv/',
+        views.exportar_prestamos_csv,
+        name='exportar_prestamos_csv'
+    ),
+
+    path(
+        'exportar/pdf/',
+        views.exportar_prestamos_pdf,
+        name='exportar_prestamos_pdf'
     ),
 
 ]
